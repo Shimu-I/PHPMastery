@@ -17,45 +17,44 @@ Learning through:
 **🔥 PHP Full Course 2025 — Learn PHP from Scratch**
 *Beginner-Friendly PHP Tutorial*
 
-**➤ COURSE CHAPTERS**
+## 📘 Course Chapters
 
-**PHP Fundamentals**
+### PHP Fundamentals
+1. Introduction to PHP Programming  
+2. Installing a Local Server for PHP  
+3. PHP Syntax Essentials  
+4. Variables and Data Types  
+5. Predefined Variables  
+6. Handling Form Data  
+7. Operators in PHP  
+8. Control Structures  
+9. PHP Exercise: Build a Calculator  
 
-1. Introduction to PHP Programming
-2. Installing a Local Server for PHP
-3. PHP Syntax Essentials
-4. Variables and Data Types
-5. Predefined Variables
-6. Handling Form Data
-7. Operators in PHP
-8. Control Structures
-9. PHP Exercise: Build a Calculator
+### Core PHP Concepts
+10. Arrays in PHP  
+11. Built-in Functions  
+12. User-Defined Functions  
+13. Variable Scope  
+14. Constants  
+15. Loops  
 
-**Core PHP Concepts**
-10. Arrays in PHP
-11. Built-in Functions
-12. User-Defined Functions
-13. Variable Scope
-14. Constants
-15. Loops
+### Database (MySQL) Integration
+16. Database Setup  
+17. Creating Database Tables  
+18. Insert and Delete Data  
+19. Retrieving Data from Database  
+20. Connecting PHP to a Database  
+21. Changing Database Password  
+22. Insert Data Using PHP  
+23. Update and Delete Data Using PHP  
+24. Select Data Using PHP  
 
-**Database (MySQL) Integration**
-16. Database Setup
-17. Creating Database Tables
-18. Insert and Delete Data
-19. Retrieving Data from Database
-20. Connecting PHP to a Database
-21. Changing Database Password
-22. Insert Data Using PHP
-23. Update and Delete Data Using PHP
-24. Select Data Using PHP
-
-**Sessions, Security, and Authentication**
-25. Creating Sessions
-26. Session Security
-27. Password Hashing
-28. PHP Exercise: Login System (Part 1)
-29. PHP Exercise: Login System (Part 2)
+### Sessions, Security, and Authentication
+25. Creating Sessions  
+26. Session Security  
+27. Password Hashing  
+28. PHP Exercise: Login System (Part 1)  
+29. PHP Exercise: Login System (Part 2)  
 
 
 ---
