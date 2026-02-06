@@ -18,6 +18,10 @@
 8. [Control Structures](#8--control-structures)
 9. [Exercise: Build a Calculator](#9--exercise-build-a-calculator)
 10. [Arrays](#10--arrays)
+11. [Built-in Functions](#11--built-in-functions)
+12. [User-Defined Functions](#12--user-defined-functions)
+13. [Variable Scope](#13--variable-scope)
+14. [Constants](#14--constants)
 
 ---
 
@@ -1420,6 +1424,490 @@ echo $foods["meat"][1];        // Output: fish
 
 ---
 
+## 11. 🛠️ Built-in Functions
+
+### 11.1 String Functions
+
+| **Why**   | PHP provides dozens of ready-made functions for manipulating text — no need to write your own.               |
+| --------- | ------------------------------------------------------------------------------------------------------------ |
+| **How**   | Call the function with your string as an argument. Most return a new value (they don't modify the original). |
+| **Where** | Form validation, display formatting, search features, data cleaning.                                         |
+
+| Function                        | What It Does                 | Example                                | Result                |
+| ------------------------------- | ---------------------------- | -------------------------------------- | --------------------- |
+| `strlen($str)`                  | Length of string             | `strlen("Hello World!")`               | `12`                  |
+| `strpos($str, $find)`           | Position of first occurrence | `strpos("Hello World!", "o")`          | `4`                   |
+| `str_replace($old, $new, $str)` | Replace text                 | `str_replace("World!", "Shimu", $str)` | `"Hello Shimu"`       |
+| `strtolower($str)`              | Convert to lowercase         | `strtolower("Hello World!")`           | `"hello world!"`      |
+| `strtoupper($str)`              | Convert to UPPERCASE         | `strtoupper("Hello World!")`           | `"HELLO WORLD!"`      |
+| `substr($str, $start, $len)`    | Extract portion of string    | `substr("Hello World!", 2, 2)`         | `"ll"`                |
+| `explode($delim, $str)`         | Split string into array      | `explode(" ", "Hello World!")`         | `["Hello", "World!"]` |
+
+```php
+<?php
+$string = "Hello World!";
+
+echo strlen($string);                          // 12
+echo strpos($string, "Wo");                    // 6
+echo str_replace("World!", "Shimu", $string);  // Hello Shimu
+echo strtolower($string);                      // hello world!
+echo strtoupper($string);                      // HELLO WORLD!
+echo substr($string, 2, 2);                    // ll
+echo substr($string, 2, -2);                   // llo Worl (from index 2, stop 2 from end)
+print_r(explode(" ", $string));                // Array ( [0] => Hello [1] => World! )
+?>
+```
+
+> **💡 Pro Tip:** `substr($str, 2, -2)` uses a **negative length** — it means "start at index 2 and stop 2 characters before the end". Very handy for trimming.
+
+---
+
+### 11.2 Math Functions
+
+| **Why**   | For calculations beyond basic arithmetic — rounding, absolute values, random numbers, etc. |
+| --------- | ------------------------------------------------------------------------------------------ |
+| **How**   | Pass numbers as arguments; the function returns the result.                                |
+| **Where** | Pricing calculations, random content, statistics, game logic.                              |
+
+| Function           | What It Does             | Example        | Result        |
+| ------------------ | ------------------------ | -------------- | ------------- |
+| `abs($n)`          | Absolute value           | `abs(-5.5)`    | `5.5`         |
+| `round($n)`        | Round to nearest integer | `round(-5.5)`  | `-6`          |
+| `pow($base, $exp)` | Exponentiation           | `pow(2, 3)`    | `8`           |
+| `sqrt($n)`         | Square root              | `sqrt(16)`     | `4`           |
+| `rand($min, $max)` | Random integer           | `rand(1, 100)` | `42` (varies) |
+
+```php
+<?php
+$number = -5.5;
+
+echo abs($number);    // 5.5
+echo round($number);  // -6
+echo pow(2, 3);       // 8
+echo sqrt(16);        // 4
+echo rand(1, 100);    // Random number between 1 and 100
+?>
+```
+
+---
+
+### 11.3 Array Functions
+
+| **Why**   | To manipulate arrays without writing manual loops.                                |
+| --------- | --------------------------------------------------------------------------------- |
+| **How**   | Pass the array as an argument. Some modify the original; some return a new array. |
+| **Where** | Data processing, filtering results, merging datasets.                             |
+
+| Function                  | What It Does                  | Modifies Original? |
+| ------------------------- | ----------------------------- | ------------------ |
+| `count($arr)`             | Number of elements            | No                 |
+| `is_array($var)`          | Check if variable is an array | No                 |
+| `array_push($arr, $val)`  | Add to end                    | ✅ Yes              |
+| `array_pop($arr)`         | Remove & return last element  | ✅ Yes              |
+| `array_reverse($arr)`     | Return reversed copy          | No                 |
+| `array_merge($a, $b)`     | Merge two arrays into one     | No                 |
+| `array_splice($arr, ...)` | Remove/insert & re-index      | ✅ Yes              |
+
+```php
+<?php
+$array1 = ["apple", "banana", "orange"];
+$array2 = ["watermelon", "dragon fruit"];
+
+echo count($array1);            // 3
+echo is_array($array1);         // 1 (true)
+
+array_push($array1, "kiwi");    // [apple, banana, orange, kiwi]
+array_pop($array1);             // Removes "kiwi" → [apple, banana, orange]
+
+print_r(array_reverse($array1));          // [orange, banana, apple]
+print_r(array_merge($array1, $array2));   // [apple, banana, orange, watermelon, dragon fruit]
+
+$a = ["a", "b", "c", "d", "e"];
+array_splice($a, 1, 2, "z");   // Remove 2 elements at index 1, insert "z"
+print_r($a);                    // [a, z, d, e]
+?>
+```
+
+---
+
+### 11.4 Date & Time Functions
+
+| **Why**   | To work with dates, timestamps, and formatted time strings.                                                            |
+| --------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **How**   | `date()` formats the current time; `time()` gives a Unix timestamp; `strtotime()` converts date strings to timestamps. |
+| **Where** | Logging, scheduling, displaying "posted 2 hours ago", expiry dates.                                                    |
+
+| Function          | What It Does                                | Example                            | Result                  |
+| ----------------- | ------------------------------------------- | ---------------------------------- | ----------------------- |
+| `date($format)`   | Current date/time formatted                 | `date("Y-m-d H:i:s")`              | `"2026-02-07 14:30:00"` |
+| `time()`          | Current Unix timestamp (seconds since 1970) | `time()`                           | `1770508200`            |
+| `strtotime($str)` | Convert date string to timestamp            | `strtotime("2026-04-11 12:00:00")` | `1775980800`            |
+
+```php
+<?php
+echo date("Y-m-d H:i:s");                  // e.g., 2026-02-07 14:30:00
+echo time();                                 // e.g., 1770508200
+echo strtotime("2026-04-11 12:00:00");       // Unix timestamp for that date
+?>
+```
+
+**Common `date()` format characters:**
+
+| Character | Meaning                | Example |
+| --------- | ---------------------- | ------- |
+| `Y`       | 4-digit year           | `2026`  |
+| `m`       | Month (01–12)          | `02`    |
+| `d`       | Day (01–31)            | `07`    |
+| `H`       | Hour 24-format (00–23) | `14`    |
+| `i`       | Minutes (00–59)        | `30`    |
+| `s`       | Seconds (00–59)        | `00`    |
+
+---
+
+## 12. ⚙️ User-Defined Functions
+
+### 12.1 Basic Functions
+
+| **Why**   | To organize reusable blocks of code. Instead of repeating the same logic, define it once and call it by name. |
+| --------- | ------------------------------------------------------------------------------------------------------------- |
+| **How**   | Use the `function` keyword, give it a name, and optionally accept parameters and return a value.              |
+| **Where** | Anywhere you have repeatable logic — calculations, formatting, API calls, validation.                         |
+
+```php
+<?php
+function sayHello()
+{
+    return "Hello World!";
+}
+
+$test = sayHello();
+echo $test;  // Output: Hello World!
+?>
+```
+
+> **💡 Best Practice:** Use `return` instead of `echo` inside functions. This makes the function **reusable** — you can store the result, pass it to another function, or decide later how to display it.
+
+---
+
+### 12.2 Functions with Parameters
+
+| **Why**   | Parameters let you pass data into a function so it can work with different values each time. |
+| --------- | -------------------------------------------------------------------------------------------- |
+| **How**   | Define parameter names in the parentheses. Pass values (arguments) when calling.             |
+| **Where** | Any function that needs to process variable data.                                            |
+
+```php
+<?php
+// Two parameters
+function userName($firstName, $lastName)
+{
+    return "Hello! " . $firstName . " " . $lastName;
+}
+
+echo userName("Jasmin", "Sultana");  // Output: Hello! Jasmin Sultana
+
+// Not all parameters need to be used
+function userName2($firstName, $middleName, $lastName)
+{
+    return "Hello! " . $firstName . " " . $middleName;
+}
+
+echo userName2("Jasmin", "Sultana", "");  // Output: Hello! Jasmin Sultana
+?>
+```
+
+---
+
+### 12.3 Default Parameter Values
+
+| **Why**   | To make parameters optional — if no value is passed, the default kicks in. |
+| --------- | -------------------------------------------------------------------------- |
+| **How**   | Assign a value with `=` in the parameter definition.                       |
+| **Where** | Optional settings, fallback values, greeting messages.                     |
+
+```php
+<?php
+function greet($name = "World")
+{
+    return "Hello " . $name . "!";
+}
+
+echo greet();         // Output: Hello World!     (uses default)
+echo greet("Shimu");  // Output: Hello Shimu!     (overrides default)
+?>
+```
+
+---
+
+### 12.4 Type Declarations & `declare(strict_types=1)`
+
+| **Why**   | To enforce that the correct data type is passed to a function. Prevents bugs caused by PHP's automatic type juggling.          |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **How**   | Add the type before the parameter name. Add `declare(strict_types=1);` at the **very top** of the file for strict enforcement. |
+| **Where** | Any function where passing the wrong type would cause incorrect behavior.                                                      |
+
+```php
+<?php
+declare(strict_types=1);  // MUST be the very first statement in the file
+
+function greet(string $name)
+{
+    return "Hello " . $name . "!";
+}
+
+echo greet("123");  // ✅ Works — "123" is a string
+// echo greet(123); // ❌ TypeError! — int given, string expected
+?>
+```
+
+**Without `strict_types`:** PHP silently converts `123` (int) to `"123"` (string) — no error.  
+**With `strict_types=1`:** PHP throws a `TypeError` — it ensures the right data goes into the right function.
+
+> **💡 Best Practice:** Always use `declare(strict_types=1);` in production code. It catches bugs early.
+
+**Common type declarations:**
+
+| Type     | Allows            |
+| -------- | ----------------- |
+| `string` | Text              |
+| `int`    | Whole numbers     |
+| `float`  | Decimal numbers   |
+| `bool`   | `true` / `false`  |
+| `array`  | Arrays            |
+| `mixed`  | Any type (PHP 8+) |
+
+---
+
+### 12.5 Practical Example: Calculator Function
+
+```php
+<?php
+function calculator($num1, $num2)
+{
+    $result = $num1 + $num2;
+    return $result;
+}
+
+echo calculator(4, 8);  // Output: 12
+?>
+```
+
+> **💡 Pro Tip:** Functions can call other functions, return arrays, or even return other functions. As you advance, you'll use these patterns constantly.
+
+---
+
+## 13. 🌐 Variable Scope
+
+### 13.1 The Four Types of Scope
+
+| **Why**   | A variable's **scope** determines where it can be accessed. Understanding scope prevents bugs where variables are unexpectedly `null` or unavailable. |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **How**   | PHP has 4 scope types, each with different visibility rules.                                                                                          |
+| **Where** | Every variable you create is affected by scope.                                                                                                       |
+
+| Scope      | Where It Lives                    | Accessible From                                            |
+| ---------- | --------------------------------- | ---------------------------------------------------------- |
+| **Global** | Outside any function or class     | Only the global level (not inside functions by default)    |
+| **Local**  | Inside a function                 | Only that function                                         |
+| **Static** | Inside a function (with `static`) | Only that function, but **persists** between calls         |
+| **Class**  | Inside a class                    | Depends on visibility (`public` / `private` / `protected`) |
+
+---
+
+### 13.2 Global vs Local Scope
+
+| **Why**   | By default, functions **cannot** see global variables. This prevents accidental modification of outside data. |
+| --------- | ------------------------------------------------------------------------------------------------------------- |
+| **How**   | Use the `global` keyword or `$GLOBALS[]` superglobal to access a global variable inside a function.           |
+| **Where** | When a function needs data defined outside of it (use sparingly).                                             |
+
+```php
+<?php
+$test = "Shimu";
+
+// Method 1: global keyword
+function myFunction()
+{
+    global $test;      // Pull the global variable into local scope
+    return $test;
+}
+echo myFunction();     // Output: Shimu
+
+// Method 2: $GLOBALS superglobal
+$test2 = "Shimu";
+
+function myFunction2()
+{
+    return $GLOBALS["test2"];  // Access global via superglobal array
+}
+echo myFunction2();    // Output: Shimu
+?>
+```
+
+> **⚠️ Not Recommended:** Accessing global variables inside functions creates hidden dependencies. It makes code harder to test and debug. **Prefer passing values as function parameters instead.**
+
+---
+
+### 13.3 Static Scope
+
+| **Why**   | Normal local variables are **destroyed** when a function ends. A `static` variable **remembers its value** between function calls. |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **How**   | Add the `static` keyword before the variable declaration inside the function.                                                      |
+| **Where** | Counters, caching, tracking how many times a function has been called.                                                             |
+
+**Without `static` — resets every time:**
+
+```php
+<?php
+function counter()
+{
+    $count = 0;       // Re-created every call
+    $count++;
+    return $count;
+}
+
+echo counter();  // 1
+echo counter();  // 1
+echo counter();  // 1  ← always 1!
+?>
+```
+
+**With `static` — remembers between calls:**
+
+```php
+<?php
+function counter()
+{
+    static $count = 0;  // Only initialized once, then persists
+    $count++;
+    return $count;
+}
+
+echo counter();  // 1
+echo counter();  // 2
+echo counter();  // 3  ← increments!
+?>
+```
+
+---
+
+### 13.4 Class Scope (Preview)
+
+| **Why**   | Variables inside a class (called **properties**) are scoped to that class.          |
+| --------- | ----------------------------------------------------------------------------------- |
+| **How**   | Define with visibility keywords. Access with `$this->` or `ClassName::` for static. |
+| **Where** | Object-oriented programming (covered in detail later).                              |
+
+```php
+<?php
+class MyClass
+{
+    static public $classVar = "Hello, world!";
+
+    public function myMethod()
+    {
+        echo $this->classVar;
+    }
+}
+
+// Access static property without creating an object
+echo MyClass::$classVar;  // Output: Hello, world!
+?>
+```
+
+> **📝 Note:** This is just a preview. OOP (Object-Oriented Programming) will be covered in depth later in the course.
+
+---
+
+### 13.5 Scope Summary
+
+| Scenario                              | Solution                                                 |
+| ------------------------------------- | -------------------------------------------------------- |
+| Need a variable inside a function     | Pass it as a **parameter** ✅                             |
+| Need to access a global variable      | Use `global` keyword or `$GLOBALS[]` (avoid if possible) |
+| Need a value to persist between calls | Use `static`                                             |
+| Need shared data across methods       | Use class properties                                     |
+
+---
+
+## 14. 🔒 Constants
+
+### 14.1 What Are Constants?
+
+| **Why**   | Constants store values that **never change** throughout your script — like configuration values, math constants, or role flags. |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **How**   | Use `define("NAME", value)`. Constants are accessed **without** a `$` sign.                                                     |
+| **Where** | Config values, API keys, feature flags, mathematical constants, at the **top** of your script.                                  |
+
+```php
+<?php
+// Define constants at the top of your script
+define("PI", 3.14);
+define("NAME", "shimu");
+define("IS_ADMIN", true);
+
+echo PI;        // Output: 3.14
+echo NAME;      // Output: shimu
+echo IS_ADMIN;  // Output: 1 (true displays as 1)
+?>
+```
+
+---
+
+### 14.2 Constants vs Variables
+
+| Feature           | Variable               | Constant                                  |
+| ----------------- | ---------------------- | ----------------------------------------- |
+| Prefix            | `$` required           | No `$`                                    |
+| Can change?       | ✅ Yes                  | ❌ No — once set, it's permanent           |
+| Scope             | Depends (global/local) | **Always global** — accessible everywhere |
+| Naming convention | `$camelCase`           | `UPPER_SNAKE_CASE`                        |
+
+```php
+<?php
+define("PI", 3.14);
+
+function test()
+{
+    echo PI;  // ✅ Works! Constants are global by default
+}
+
+test();  // Output: 3.14
+?>
+```
+
+> **💡 Best Practice:**
+> - Always use **UPPER_SNAKE_CASE** for constant names (`PI`, `MAX_RETRIES`, `IS_ADMIN`)
+> - Can be written in lowercase, but **uppercase is the convention** and makes constants visually distinct from variables
+> - Define constants at the **top** of your script for easy reference
+
+---
+
+### 14.3 `define()` vs `const`
+
+There are actually two ways to define constants:
+
+```php
+<?php
+// Method 1: define() — works anywhere, even inside if-blocks
+define("SITE_NAME", "PHPMastery");
+
+// Method 2: const — must be at the top-level (not inside functions/if-blocks)
+const DB_HOST = "localhost";
+?>
+```
+
+| Feature                       | `define()` | `const`      |
+| ----------------------------- | ---------- | ------------ |
+| Can use inside `if` blocks?   | ✅ Yes      | ❌ No         |
+| Can use expressions as value? | ✅ Yes      | ❌ No         |
+| Available in classes?         | ❌ No       | ✅ Yes        |
+| Defined at                    | Runtime    | Compile time |
+
+> **💡 Rule of thumb:** Use `define()` in procedural scripts. Use `const` inside classes.
+
+---
+
 ## 📌 Quick Reference Card
 
 ```
@@ -1455,8 +1943,23 @@ count($arr)            → Number of elements in array
 array_push($a, $v)     → Add element to end of array
 array_splice($a,i,n)   → Remove/insert & re-index
 sort() / asort()       → Sort array (drop keys / keep keys)
+strlen() / strpos()    → String length / find position
+str_replace(o,n,str)   → Replace text in string
+strtolower/strtoupper  → Change string case
+substr() / explode()   → Extract / split strings
+abs() / round() / sqrt → Math functions
+rand($min, $max)       → Random number
+date("Y-m-d")          → Current date formatted
+time() / strtotime()   → Unix timestamp / parse date
+function name() {}     → Define a function
+return $value;         → Return from function
+declare(strict_types=1)→ Enforce type safety
+global $var            → Access global inside function
+static $var            → Persist value between calls
+define("NAME", val)    → Define a constant
+const NAME = val       → Define constant (compile-time)
 ```
 
 ---
 
-> **🚀 Keep Learning!** This cheat sheet will grow as you progress through functions, loops, OOP, and database integration. Keep adding notes!
+> **🚀 Keep Learning!** This cheat sheet will grow as you progress through loops, OOP, and database integration. Keep adding notes!
