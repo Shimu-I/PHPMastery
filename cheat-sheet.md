@@ -17,6 +17,7 @@
 7. [Operators](#7--operators)
 8. [Control Structures](#8--control-structures)
 9. [Exercise: Build a Calculator](#9--exercise-build-a-calculator)
+10. [Arrays](#10--arrays)
 
 ---
 
@@ -1153,6 +1154,272 @@ The `case` strings (`'add'`, `'subtract'`, etc.) must **exactly match** the `<op
 
 ---
 
+## 10. 📚 Arrays
+
+### 10.1 Indexed Arrays
+
+| **Why**   | To store a list of related values under a single variable name, accessed by numeric position (index starting at 0). |
+| --------- | ------------------------------------------------------------------------------------------------------------------- |
+| **How**   | Use `[]` (modern) or `array()` (older). Each value gets an automatic numeric index.                                 |
+| **Where** | Lists of items, collections of data, anything that's a sequence.                                                    |
+
+**Two ways to create an array:**
+
+```php
+<?php
+// Method 1 — older syntax
+$fruits = array('apple', 'banana', 'cherry');
+
+// Method 2 — modern shorthand (preferred)
+$flowers = [
+    'lily',   // index 0
+    'rose',   // index 1
+    'lotus'   // index 2
+];
+
+// Access by index
+echo $flowers[0];  // Output: lily
+?>
+```
+
+> **💡 Pro Tip:** Use `print_r($array)` to display the full array with its indexes — great for debugging:
+> ```php
+> print_r($flowers);
+> // Output: Array ( [0] => lily [1] => rose [2] => lotus )
+> ```
+
+---
+
+### 10.2 Adding, Replacing & Removing Elements (Indexed)
+
+| **Why**   | Arrays are rarely static — you'll need to add, update, and remove items constantly. |
+| --------- | ----------------------------------------------------------------------------------- |
+| **How**   | PHP provides several ways depending on where and how you want to modify the array.  |
+| **Where** | Shopping carts, to-do lists, search results, any dynamic collection.                |
+
+#### Adding Elements
+
+```php
+<?php
+$flowers = ['lily', 'rose', 'lotus'];
+
+// Method 1: array_push() — adds to the end
+array_push($flowers, "Daisy");
+// $flowers = ['lily', 'rose', 'lotus', 'Daisy']
+
+// Method 2: [] shorthand — also adds to the end
+$flowers[] = 'lavender';
+// $flowers = ['lily', 'rose', 'lotus', 'Daisy', 'lavender']
+?>
+```
+
+> **📝 Note:** `array_push()` only works for indexed arrays. The `[]` shorthand works the same way and is shorter.
+
+#### Replacing Elements
+
+```php
+<?php
+// Replace a specific index
+$flowers[1] = 'sun flower';  // 'rose' is now 'sun flower'
+?>
+```
+
+#### Removing Elements
+
+```php
+<?php
+// unset() — removes the value but LEAVES A HOLE in the index
+unset($flowers[2]);
+print_r($flowers);
+// Indexes: 0, 1, 3, 4 — index 2 is gone, others NOT re-indexed
+
+// array_splice() — removes AND re-indexes
+array_splice($flowers, 0, 1);  // Remove 1 element starting at index 0
+print_r($flowers);
+// The array is re-indexed: 0, 1, 2...
+?>
+```
+
+| Method                             | Removes           | Re-indexes?       | Use when                                        |
+| ---------------------------------- | ----------------- | ----------------- | ----------------------------------------------- |
+| `unset($arr[i])`                   | Specific index    | ❌ No (leaves gap) | Associative arrays or when index doesn't matter |
+| `array_splice($arr, start, count)` | Range of elements | ✅ Yes             | Indexed arrays where order matters              |
+
+> **⚠️ Watch out:** After `unset()`, the array will have a "hole" in the indexes. If you loop with `for ($i = 0; ...)`, you may hit missing indexes. Use `array_values()` to re-index, or use `foreach` instead.
+
+---
+
+### 10.3 Inserting & Merging with `array_splice()`
+
+| **Why**   | To insert elements at a specific position or merge another array into the middle of an existing one. |
+| --------- | ---------------------------------------------------------------------------------------------------- |
+| **How**   | `array_splice($array, position, 0, $newItems)` — the `0` means "delete nothing, just insert".        |
+| **Where** | Ordered lists, priority queues, inserting between existing items.                                    |
+
+```php
+<?php
+$fruits = ['apple', 'orange', 'banana', 'watermelon'];
+
+// Insert "Mango" at position 1 (without removing anything)
+array_splice($fruits, 1, 0, "Mango");
+print_r($fruits);
+// [apple, Mango, orange, banana, watermelon]
+
+// Merge another array into position 3
+$tests = ['test1', 'test2'];
+array_splice($fruits, 3, 0, $tests);
+print_r($fruits);
+// [apple, Mango, orange, test1, test2, banana, watermelon]
+?>
+```
+
+**`array_splice()` cheat sheet:**
+
+| Call                               | What it does                             |
+| ---------------------------------- | ---------------------------------------- |
+| `array_splice($arr, 0, 1)`         | Remove first element (re-indexes)        |
+| `array_splice($arr, 1, 0, "X")`    | Insert "X" at index 1 (no deletion)      |
+| `array_splice($arr, 2, 1, "Y")`    | Replace element at index 2 with "Y"      |
+| `array_splice($arr, 3, 0, $other)` | Merge `$other` array starting at index 3 |
+
+---
+
+### 10.4 Associative Arrays (Key → Value)
+
+| **Why**   | To use meaningful **string keys** instead of numeric indexes — much more readable when data has labels. |
+| --------- | ------------------------------------------------------------------------------------------------------- |
+| **How**   | Define with `"key" => "value"` pairs. Access values using the key name.                                 |
+| **Where** | User profiles, settings, database rows, any data that has labels (name, email, role, etc.).             |
+
+```php
+<?php
+// Create an associative array
+$tasks = [
+    "laundry" => "Daniel",
+    "trash"   => "Frida",
+    "vacuum"  => "Basse",
+    "dishes"  => "Bella",
+];
+
+// Access by key
+echo $tasks['laundry'];  // Output: Daniel
+
+// Print full array
+print_r($tasks);
+// Array ( [laundry] => Daniel [trash] => Frida [vacuum] => Basse [dishes] => Bella )
+
+// Add a new key-value pair
+$tasks["dusting"] = "Tara";
+
+// Count elements
+echo count($tasks);  // Output: 5
+?>
+```
+
+> **💡 Pro Tip:** Use `count($array)` to get the number of elements in any array (indexed or associative).
+
+---
+
+### 10.5 Sorting Arrays
+
+| **Why**   | To arrange array elements in alphabetical, numerical, or custom order.  |
+| --------- | ----------------------------------------------------------------------- |
+| **How**   | PHP has multiple sort functions depending on what you need to preserve. |
+| **Where** | Displaying sorted lists, leaderboards, search results.                  |
+
+```php
+<?php
+$tasks = [
+    "laundry" => "Daniel",
+    "trash"   => "Frida",
+    "vacuum"  => "Basse",
+    "dishes"  => "Bella",
+];
+
+sort($tasks);
+print_r($tasks);
+// Array ( [0] => Basse [1] => Bella [2] => Daniel [3] => Frida )
+?>
+```
+
+> **⚠️ Important:** `sort()` **destroys the keys** — the associative array becomes an indexed array! Use `asort()` to sort by value while keeping keys, or `ksort()` to sort by key.
+
+| Function   | Sorts by | Keeps keys?       | Order         |
+| ---------- | -------- | ----------------- | ------------- |
+| `sort()`   | Value    | ❌ No (re-indexes) | A → Z / 0 → 9 |
+| `rsort()`  | Value    | ❌ No              | Z → A / 9 → 0 |
+| `asort()`  | Value    | ✅ Yes             | A → Z         |
+| `arsort()` | Value    | ✅ Yes             | Z → A         |
+| `ksort()`  | Key      | ✅ Yes             | A → Z         |
+| `krsort()` | Key      | ✅ Yes             | Z → A         |
+
+---
+
+### 10.6 Multidimensional Arrays
+
+| **Why**   | To store arrays inside arrays — like a table with rows and columns, or grouped data. |
+| --------- | ------------------------------------------------------------------------------------ |
+| **How**   | Nest arrays inside an array. Access with chained indexes: `$arr[row][col]`.          |
+| **Where** | Menus with categories, database result sets, grouped data structures.                |
+
+#### Indexed Multidimensional
+
+```php
+<?php
+$foods = [
+    array("apple", "mango"),  // index 0 (sub-array)
+    "banana",                  // index 1
+    "cherry"                   // index 2
+];
+
+echo $foods[0][0];  // Output: apple
+echo $foods[0][1];  // Output: mango
+echo $foods[1];     // Output: banana
+?>
+```
+
+#### Associative Multidimensional
+
+```php
+<?php
+$foods = [
+    "fruits"     => ["apple", "banana", "cherry"],
+    "meat"       => ["chicken", "fish"],
+    "vegetables" => ["cucumber", "carrot"],
+];
+
+echo $foods["vegetables"][0];  // Output: cucumber
+echo $foods["fruits"][2];      // Output: cherry
+echo $foods["meat"][1];        // Output: fish
+?>
+```
+
+> **💡 Pro Tip:** You can go as deep as you want (`$arr[0][1][2]`...), but more than 2–3 levels usually means you should use **objects/classes** instead for better readability.
+
+---
+
+### 10.7 Arrays — Quick Summary
+
+| Type                 | Syntax                   | Access               |
+| -------------------- | ------------------------ | -------------------- |
+| **Indexed**          | `['a', 'b', 'c']`        | `$arr[0]`, `$arr[1]` |
+| **Associative**      | `['key' => 'val']`       | `$arr['key']`        |
+| **Multidimensional** | `[['a','b'], ['c','d']]` | `$arr[0][1]`         |
+
+| Common Function            | What It Does                   |
+| -------------------------- | ------------------------------ |
+| `count($arr)`              | Number of elements             |
+| `print_r($arr)`            | Display array contents (debug) |
+| `array_push($arr, $val)`   | Add to end (indexed)           |
+| `$arr[] = $val`            | Add to end (shorthand)         |
+| `unset($arr[$i])`          | Remove element (leaves gap)    |
+| `array_splice($arr, i, n)` | Remove & re-index              |
+| `sort()` / `rsort()`       | Sort values (destroys keys)    |
+| `asort()` / `arsort()`     | Sort values (keeps keys)       |
+| `ksort()` / `krsort()`     | Sort by keys                   |
+
+---
+
 ## 📌 Quick Reference Card
 
 ```
@@ -1171,6 +1438,7 @@ filter_input(...)      → Sanitize input at source
 header("Location: x")  → Redirect
 exit()                 → Stop script execution
 var_dump($x)           → Debug — show type + value
+print_r($arr)          → Debug — show array contents
 .                      → String concatenation
 +  -  *  /  %  **      → Arithmetic operators
 ==  ===  !=  !==  <>   → Comparison operators
@@ -1183,8 +1451,12 @@ switch ($x) { case: }  → Match one value against many
 match ($x) { val => }  → Strict match expression (PHP 8+)
 is_numeric($x)        → Check if value is a number
 empty($x)              → Check if value is empty/falsy
+count($arr)            → Number of elements in array
+array_push($a, $v)     → Add element to end of array
+array_splice($a,i,n)   → Remove/insert & re-index
+sort() / asort()       → Sort array (drop keys / keep keys)
 ```
 
 ---
 
-> **🚀 Keep Learning!** This cheat sheet will grow as you progress through arrays, functions, loops, OOP, and database integration. Keep adding notes!
+> **🚀 Keep Learning!** This cheat sheet will grow as you progress through functions, loops, OOP, and database integration. Keep adding notes!
