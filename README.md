@@ -61,10 +61,10 @@ Learning through:
 
 ## Study Record
 
-| Day no and date | Topic Covered | Time spent | YouTube Timestamp | Exercises Done | Satisfaction Level |
-| --- | --- | --- | --- | --- | --- |
-|  |  |  |  |  |  |
-|  |  |  |  |  |  |
+| Day no and date                         | Topic Covered  | Time spent | YouTube Timestamp | Exercises Done | Satisfaction Level |
+| --------------------------------------- | -------------- | ---------- | ----------------- | -------------- | ------------------ |
+| Dani Krossing – PHP Tutorials (Updated) |                |            |                   |                |                    |
+| Day-01 -- 6 Feb, 2026                   | lesson 0 to 10 | 7h         | 3:02:52           | N/A            | good               |
 
 ---
 
