@@ -1,4 +1,4 @@
-# Instruction about how to change Xampp phpmyadmin password and handle the error
+# !!Instruction about how to change Xampp phpmyadmin password and handle the error
 
 
 
