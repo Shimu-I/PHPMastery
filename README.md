@@ -66,6 +66,8 @@ Learning through:
 | Dani Krossing – PHP Tutorials (Updated) |                 |            |                   |                |                    |
 | Day-01 -- 6 Feb, 2026                   | lesson 0 to 10  | 7h         | 3:02:52           | N/A            | good               |
 | Day-02 -- 7 Feb, 2026                   | lesson 11 to 16 | 3h 56min   | 4:26:00           | N/A            | good               |
+| Day-03 -- 8 Feb, 2026                   | lesson 17 to 24 | 5h 34min   | 6:51:38           | N/A            | good               |
+
 
 ---
 
