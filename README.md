@@ -9,6 +9,11 @@ Learning through:
 1. [**CodeWithHarry – PHP Full Course (Playlist)**](https://youtube.com/playlist?list=PLu0W_9lII9aikXkRE0WxDt1vozo3hnmtR&si=5pql6VWUmi_OntJl)
 2. [**Dani Krossing – PHP Tutorials (Playlist)**](https://www.youtube.com/playlist?list=PL0eyrZgxdwhwBToawjm9faF1ixePexft-)
 3. [**Dani Krossing – PHP Tutorials (Updated)**](https://youtu.be/l4_Vn-sTBL8?si=oIlard26LXkoZ2Qi)
+4. [**Dani Krossing – Object Oriented PHP Tutorials (Old 2022 Playlist)**](https://www.youtube.com/playlist?list=PL0eyrZgxdwhypQiZnYXM7z7-OTkcMgGPh)
+5. [**Dani Krossing – Learn Object Oriented PHP for Beginners (New but short)**](https://www.youtube.com/watch?v=yrFr5PMdk2A)
+6. [**Dani Krossing – How To Create A OOP PHP Login System For Beginners**](https://www.youtube.com/watch?v=BaEm2Qv14oU)
+7. [**Dani Krossing – List of All Basic PHP Security You Need to Know**](https://www.youtube.com/watch?v=ZcwfGXIoA6A)
+8. [**Dani Krossing – 3 Beginner Mistakes in PHP When it Comes to Form Data**](https://www.youtube.com/watch?v=0VJgiVnon88)
 
 *(YouTube tutorial links – PHP Basics to Advanced)*
 
