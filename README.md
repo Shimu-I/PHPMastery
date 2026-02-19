@@ -19,9 +19,7 @@ Learning through:
 
 ---
 
-**🔥 PHP Full Course 2025 — Learn PHP from Scratch**
-*Beginner-Friendly PHP Tutorial*
-
+# **Dani Krossing – PHP Tutorials (Updated)**
 ## 📘 Course Chapters
 
 ### PHP Fundamentals
