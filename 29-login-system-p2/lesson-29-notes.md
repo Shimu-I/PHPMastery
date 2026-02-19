@@ -11,14 +11,14 @@ Part 2 continues from **Lesson 28** and adds the **Login**, **Logout**, and **Se
 
 ## What's New in Part 2 (Added on top of Part 1)
 
-| Feature | Files Added/Changed | Why |
-|---|---|---|
-| **Login system** | `login.inc.php`, `login_contr.inc.php`, `login_model.inc.php`, `login_view.inc.php` | Users can now log in with username & password |
-| **Logout system** | `logout.inc.php` | Users can destroy their session and log out |
-| **Login form visibility** | `index.php` | Login form hides when user is already logged in |
-| **Session ID regeneration** | `config_session.inc.php` | Prevents session fixation attacks by regenerating session IDs |
-| **Login error display** | `login_view.inc.php` | Shows login errors and success messages |
-| **Username display** | `login_view.inc.php` | Shows "logged in as ..." when session is active |
+| Feature                     | Files Added/Changed                                                                 | Why                                                           |
+| --------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **Login system**            | `login.inc.php`, `login_contr.inc.php`, `login_model.inc.php`, `login_view.inc.php` | Users can now log in with username & password                 |
+| **Logout system**           | `logout.inc.php`                                                                    | Users can destroy their session and log out                   |
+| **Login form visibility**   | `index.php`                                                                         | Login form hides when user is already logged in               |
+| **Session ID regeneration** | `config_session.inc.php`                                                            | Prevents session fixation attacks by regenerating session IDs |
+| **Login error display**     | `login_view.inc.php`                                                                | Shows login errors and success messages                       |
+| **Username display**        | `login_view.inc.php`                                                                | Shows "logged in as ..." when session is active               |
 
 ---
 
@@ -94,11 +94,11 @@ function get_user(object $pdo, string $username) {
 - `declare(strict_types=1)` — enforces type checking
 - **3 validation functions:**
 
-| Function | What it checks |
-|---|---|
-| `is_input_empty($username, $pwd)` | Are username or password empty? |
-| `is_username_wrong($result)` | Did the DB query return `false` (user not found)? |
-| `is_password_wrong($pwd, $hashPwd)` | Does `password_verify()` fail? |
+| Function                            | What it checks                                    |
+| ----------------------------------- | ------------------------------------------------- |
+| `is_input_empty($username, $pwd)`   | Are username or password empty?                   |
+| `is_username_wrong($result)`        | Did the DB query return `false` (user not found)? |
+| `is_password_wrong($pwd, $hashPwd)` | Does `password_verify()` fail?                    |
 
 - `is_username_wrong()` uses a **union type**: `bool|array $result` — because `PDO::fetch()` returns `false` (bool) on failure or an array on success
 
@@ -108,9 +108,9 @@ function get_user(object $pdo, string $username) {
 
 - **2 functions:**
 
-| Function | Purpose |
-|---|---|
-| `output_username()` | Displays "logged in as [username]" or "not logged in" based on `$_SESSION["user_id"]` |
+| Function               | Purpose                                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| `output_username()`    | Displays "logged in as [username]" or "not logged in" based on `$_SESSION["user_id"]`                    |
 | `check_login_errors()` | Displays login error messages from `$_SESSION["errors_login"]` and clears them, or shows success message |
 
 ---
@@ -145,10 +145,10 @@ die();
 
 **Two regeneration functions:**
 
-| Function | For | What it does |
-|---|---|---|
-| `regenerate_session_id()` | Guest (not logged in) | Simple `session_regenerate_id(true)` + update timestamp |
-| `regenerate_session_id_loggedin()` | Logged-in user | Simple `session_regenerate_id(true)` + update timestamp |
+| Function                           | For                   | What it does                                            |
+| ---------------------------------- | --------------------- | ------------------------------------------------------- |
+| `regenerate_session_id()`          | Guest (not logged in) | Simple `session_regenerate_id(true)` + update timestamp |
+| `regenerate_session_id_loggedin()` | Logged-in user        | Simple `session_regenerate_id(true)` + update timestamp |
 
 **Why regenerate session IDs?**
 - Prevents **session fixation attacks** — where an attacker sets a known session ID and waits for the victim to log in with it
